@@ -10,14 +10,20 @@ using std::cin;
 using std::endl;
 
 #define INPUT_SCR_HEIGHT 3
+#define RENDER_TANK 0x01
+#define RENDER_INPUT 0x02
+// #define RENDER_ 0x04
+// #define RENDER_ 0x08
+// #define RENDER_ 0x10
+// #define RENDER_ 0x20
+// #define RENDER_ 0x40
+// #define RENDER_ 0x80
 
-int render(WINDOW** window_list, uint size);
+#define byte unsigned char
 
 int main(int argc, char** argv){
 
-    char testarr[16] = {0};
-    const uint RENDER_LIST_SIZE = 2;
-    WINDOW* render_list[RENDER_LIST_SIZE];
+    byte render_byte = 0x00;
 
     initscr();
     cbreak(); // give the programmer access to user input as the char is typed
@@ -27,15 +33,25 @@ int main(int argc, char** argv){
     const int LINES = getmaxy(stdscr);
 
     WINDOW* tank_scr = newwin((LINES - INPUT_SCR_HEIGHT), (COLUMNS), 0, 0);
-    render_list[0] = tank_scr;
+    
     WINDOW* input_scr = newwin(INPUT_SCR_HEIGHT, (COLUMNS), (LINES - INPUT_SCR_HEIGHT), 0);
-    render_list[1] = input_scr;
 
     box(tank_scr, 0, 0);
+    render_byte = render_byte | RENDER_TANK;
+
     box(input_scr, 0, 0);
+    render_byte = render_byte | RENDER_INPUT;
 
-    render(render_list, RENDER_LIST_SIZE);
+    // render loop
+    if(render_byte & RENDER_TANK){
+        wnoutrefresh(tank_scr);
+    }
+    if(render_byte & RENDER_INPUT){
+        wnoutrefresh(input_scr);
+    }
+    doupdate();
 
+    char testarr[16] = {0};
     echo();
     mvwgetnstr(input_scr, 1, 1, testarr, 15);
 
@@ -44,31 +60,4 @@ int main(int argc, char** argv){
     cout << testarr << endl;
 
     return 0;
-}
-
-/**
- * Renders and list of windows starting from 0 to n in the list
- * 
- * @param window_list the list of WINDOW* to render
- * @param list_size the size of the list
- * @return the status code of the operation
- */
-int render(WINDOW** window_list, uint list_size){
-
-    int status_code;
-
-    for(uint i = 0; i < list_size; i++){
-
-        if((status_code = wnoutrefresh(window_list[i])) != OK){
-            return ERR;
-        }
-
-    }
-
-    if((status_code = doupdate()) != OK){
-        return ERR;
-    }
-
-    return OK;
-    
 }
