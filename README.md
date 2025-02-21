@@ -7,7 +7,8 @@ This is a "redux" of the [virtualfish project](https://www.github.com/kirkseytc/
 To run virtualfish-redux either run `virtualfish` or `vfish`.
 
 After starting execution you will be greeted with this title screen.  
-Simply press space to continue.  
+Simply press space to continue.
+  
 ![Screenshot of the Title Screen](imgs/title_screen.png)
 
 ### Commands
