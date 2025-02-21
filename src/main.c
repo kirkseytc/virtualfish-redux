@@ -8,7 +8,7 @@
 
 struct SAND_ARRAY Sand;
 
-int main(int argc, char** argv){
+int main(void){ // int argc, char** argv
 
     srand(time(NULL)); // seeding rng
 
@@ -177,7 +177,7 @@ void gen_sand(){
 
     int ch_index = 1;
 
-    for(int i = 0; i < SIZE; i++){
+    for(unsigned int i = 0; i < SIZE; i++){
 
         /*
             0 = stay same
