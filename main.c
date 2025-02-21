@@ -5,6 +5,8 @@
 
 #include "main.h"
 
+struct sand_array Sand;
+
 int main(int argc, char** argv){
 
     srand(time(NULL)); // seeding rng
@@ -20,24 +22,11 @@ int main(int argc, char** argv){
     start_color();
     init_color_pairs();
 
-    cbreak(); // give the programmer access to user input as the char is typed
-    noecho(); // doesn't echo user inputs
-    timeout(16); // Note: halfdelay(0) turns it off
-    curs_set(0); // Note: curs_set(1) shows the cursor again
+    game_on();
 
     init_env();
 
-    while(true){
-
-        char input = getch();
-
-        if(input != ERR){
-            break;
-        }
-
-        update_env();
-
-    }
+    update_loop();
 
     endwin();
 
@@ -51,11 +40,46 @@ void init_env(){ // initalizing tank screen
     attroff(A_BOLD);
     
     water();
-    sand();
+    gen_sand();
+    draw_sand();
+    refresh();
 
 }
 
-void update_env(){
+void update_loop(){
+
+    while(true){
+
+        char input = getch();
+
+        if(input == ':'){
+
+            char cstr[128];
+
+            WINDOW* input_win = newwin(1, getmaxx(stdscr) - 2, getmaxy(stdscr) - 2, 1);
+            waddch(input_win, ':');
+
+            wrefresh(input_win);
+
+            game_off();
+
+            wgetnstr(input_win, cstr, 127);
+
+            game_on();
+
+            delwin(input_win);
+
+            draw_sand();
+
+        }
+
+        if(input == 'q'){
+            break;
+        }
+
+        refresh();
+
+    }
 
 }
 
@@ -65,15 +89,15 @@ void update_env(){
 void water(){ 
 
     const char WATER_CHR[] = {'-', '.', '_'};
-    const int WATER_OFFSET = 3;
+    const int WATER_OFFSET = 2;
     const int WATER_START = 1;
     const int WATER_Y = 1;
 
-    const int LENGTH = getmaxx(stdscr) - WATER_OFFSET;
+    const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
 
     attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD);
 
-    for(int counter = 0; counter < (LENGTH + 1); counter++){
+    for(int counter = 0; counter < SIZE; counter++){
 
         int x = WATER_START + counter; // gets cursor x pos
         char ch = 0;
@@ -104,25 +128,21 @@ void water(){
 }
 
 /**
- * Prints a randomly generated sand pattern at the bottom of the tank
+ * Prints a randomly generated Sand pattern at the bottom of the tank
  */
-void sand(){
+void gen_sand(){
 
     const char SAND_CHR[] = {'-', '.', '_'};
-    const int SAND_OFFSET_X = 3;
-    const int SAND_OFFSET_Y = 2;
-    const int SAND_START = 1;
-
-    const int SAND_Y = getmaxy(stdscr) - SAND_OFFSET_Y;
-    const int LENGTH = getmaxx(stdscr) - SAND_OFFSET_X;
+    const int SAND_OFFSET_X = 2;
     
+    const unsigned int SIZE = getmaxx(stdscr) - SAND_OFFSET_X;
+    
+    Sand.size = SIZE + 1; // plus 1 for the '\0'
+    Sand.sand_pattern = malloc(sizeof(char) * Sand.size);
+
     int ch_index = 1;
 
-    attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-
-    for(int i = 0; i < (LENGTH + 1); i++){
-
-        int x = i + SAND_START;
+    for(int i = 0; i < SIZE; i++){
 
         /*
             0 = stay same
@@ -149,11 +169,22 @@ void sand(){
                 break;
         }
 
-        mvaddch(SAND_Y, x, SAND_CHR[ch_index]);
+        Sand.sand_pattern[i] = SAND_CHR[ch_index];
+        
     }
 
-    attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    Sand.sand_pattern[Sand.size - 1] = '\0';
 
+}
+
+void draw_sand(){
+
+    const int SAND_OFFSET = 2;
+
+    attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    mvprintw((getmaxy(stdscr) - SAND_OFFSET), 1, "%s", Sand.sand_pattern);
+    attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    
 }
 
 void init_color_pairs(){
@@ -166,3 +197,20 @@ void init_color_pairs(){
     init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
 }
 
+void game_on(){
+
+    cbreak(); 
+    noecho(); 
+    timeout(16); 
+    curs_set(0);
+
+}
+
+void game_off(){
+
+    nocbreak(); 
+    echo(); 
+    timeout(-1); 
+    curs_set(1);
+
+}
