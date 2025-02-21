@@ -8,12 +8,15 @@ I wrote the original virtualfish in my first semester of my second year in colle
 ### Install
 ### Running
 ### Start Flags
-|Flag|Arguments|Description|
+|Flag|Argument|Description|
 |----|---------|-----------|
 |`-s`|`<seed>`|Seeds the randomizer to the amount passed in `<seed>`|
 |`-c`|`<count>`|Sets the starting amount of fish to the amount passed in `<count>`|
 |`-m`|`<max>`|Sets the max amount of fish possible to the amount passed in `<max>`|
 |`-bw`|N/A|Starts in Black and White mode|
 |`-nt`|N/A|Skips the title screen|
+
+Example: Starts virtualfish with 5 fish, a max of 20 fish, and skips the title screen.
+`virtualfish -c 5 -m 20 -nt` 
 
 ## Releases
