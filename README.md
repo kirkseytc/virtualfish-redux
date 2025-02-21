@@ -8,11 +8,11 @@ To run virtualfish-redux either run `virtualfish` or `vfish`.
 
 After starting execution you will be greeted with this title screen.  
 Simply press space to continue.
-  
+
 ![Screenshot of the Title Screen](imgs/title_screen.png)
 
 ### Commands
-To run a command type a `:`.  
+To run a command type a ':' (or ';').  
 This will pause gameplay and bring up a input window.  
 In this window you are able to type in commands to interact with the tank.  
 
