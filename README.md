@@ -7,7 +7,7 @@ I wrote the original virtualfish in my first semester of my second year in colle
 ## Using virtualfish-redux
 ### Install
 ### Running
-### Start Flags
+### Flags
 |Flag|Argument|Description|
 |----|---------|-----------|
 |`-s`|`<seed>`|Seeds the randomizer to the amount passed in `<seed>`|
@@ -16,7 +16,11 @@ I wrote the original virtualfish in my first semester of my second year in colle
 |`-bw`|N/A|Starts in Black and White mode|
 |`-nt`|N/A|Skips the title screen|
 
-Example: Starts virtualfish with 5 fish, a max of 20 fish, and skips the title screen.
-`virtualfish -c 5 -m 20 -nt` 
+Example: 
+Start with 5 fish, a max of 20 fish, and skip the title screen
+
+`virtualfish -c 5 -m 20 -nt`[^*] 
+
+[^*]: the order of the flags don't matter.
 
 ## Releases
