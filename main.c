@@ -4,8 +4,9 @@
 #include <ncurses.h>
 
 #include "main.h"
+#include "fish_graphic.h"
 
-struct sand_array Sand;
+struct SAND_ARRAY Sand;
 
 int main(int argc, char** argv){
 
@@ -26,6 +27,8 @@ int main(int argc, char** argv){
 
     init_env();
 
+    title_screen();
+
     update_loop();
 
     endwin();
@@ -33,16 +36,40 @@ int main(int argc, char** argv){
     return 0;
 }
 
-void init_env(){ // initalizing tank screen
+void init_env(){ 
 
-    attron(A_BOLD);
-    box(stdscr, 0, 0);
-    attroff(A_BOLD);
-    
-    water();
+    draw_box();
+    draw_water();
     gen_sand();
     draw_sand();
     refresh();
+
+}
+
+void title_screen(){
+
+    const char* TITLE = "Virtualfish Redux";
+    const char* MSG = "Press any key to continue";
+
+    WINDOW* title_win = newwin(8, 32, ((getmaxy(stdscr) / 2) - 4), ((getmaxx(stdscr) / 2) - 16));
+    mvwaddnstr(title_win, 0, 8, TITLE, 18);
+    wattron(title_win, COLOR_PAIR(COLOR_CYAN));
+    mvwaddnstr(title_win, 1, 1, FISH_GRAPHIC[0], 30);
+    mvwaddnstr(title_win, 2, 1, FISH_GRAPHIC[1], 30);
+    mvwaddnstr(title_win, 3, 1, FISH_GRAPHIC[2], 30);
+    mvwaddnstr(title_win, 4, 1, FISH_GRAPHIC[3], 30);
+    mvwaddnstr(title_win, 5, 1, FISH_GRAPHIC[4], 30);
+    mvwaddnstr(title_win, 6, 1, FISH_GRAPHIC[5], 30);
+    wattroff(title_win, COLOR_PAIR(COLOR_CYAN));
+    mvwaddnstr(title_win, 7, 4, MSG, 26);
+    wrefresh(title_win);
+
+    while(getch() == ERR);
+
+    wclear(title_win);
+    wrefresh(title_win);
+
+    delwin(title_win);
 
 }
 
@@ -83,10 +110,15 @@ void update_loop(){
 
 }
 
-/**
- * Prints water pattern at the top of the tank
- */
-void water(){ 
+void draw_box(){
+
+    attron(A_BOLD);
+    box(stdscr, 0, 0);
+    attroff(A_BOLD);
+
+}
+
+void draw_water(){ 
 
     const char WATER_CHR[] = {'-', '.', '_'};
     const int WATER_OFFSET = 2;
@@ -127,9 +159,6 @@ void water(){
 
 }
 
-/**
- * Prints a randomly generated Sand pattern at the bottom of the tank
- */
 void gen_sand(){
 
     const char SAND_CHR[] = {'-', '.', '_'};
@@ -184,10 +213,11 @@ void draw_sand(){
     attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
     mvprintw((getmaxy(stdscr) - SAND_OFFSET), 1, "%s", Sand.sand_pattern);
     attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-    
+
 }
 
 void init_color_pairs(){
+
     init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
     init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
     init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
@@ -195,6 +225,7 @@ void init_color_pairs(){
     init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
     init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
     init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+
 }
 
 void game_on(){
