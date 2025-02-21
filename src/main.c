@@ -4,7 +4,7 @@
 #include <ncurses.h>
 
 #include "main.h"
-#include "fish_graphic"
+#include "fish_graphic.h"
 
 struct SAND_ARRAY Sand;
 

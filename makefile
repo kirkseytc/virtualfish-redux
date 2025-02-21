@@ -7,7 +7,7 @@ virtualfish: $(build_dir)/main.o
 	@gcc $^ -lncurses -o virtualfish
 	@echo "Done!"
 
-$(build_dir)/main.o: $(code_dir)/main.c $(code_dir)/main.h $(code_dir)/fish_graphic
+$(build_dir)/main.o: $(code_dir)/main.c $(code_dir)/main.h $(code_dir)/fish_graphic.h
 	@if [ ! -d $(build_dir) ]; then echo "Creating build directory..." && mkdir $(build_dir); fi
 	@echo "Compiling..."
 	@gcc -c $< -o $(build_dir)/main.o -Wall -Wextra -Werror
