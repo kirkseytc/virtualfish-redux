@@ -19,12 +19,25 @@ int main(int argc, char** argv){
 
     start_color();
     init_color_pairs();
+
     cbreak(); // give the programmer access to user input as the char is typed
     noecho(); // doesn't echo user inputs
+    timeout(16); // Note: halfdelay(0) turns it off
+    curs_set(0); // Note: curs_set(1) shows the cursor again
 
     init_env();
 
-    mvgetch(2, 1);
+    while(true){
+
+        char input = getch();
+
+        if(input != ERR){
+            break;
+        }
+
+        update_env();
+
+    }
 
     endwin();
 
@@ -33,15 +46,16 @@ int main(int argc, char** argv){
 
 void init_env(){ // initalizing tank screen
 
+    attron(A_BOLD);
     box(stdscr, 0, 0);
+    attroff(A_BOLD);
+    
     water();
     sand();
 
 }
 
 void update_env(){
-
-
 
 }
 
