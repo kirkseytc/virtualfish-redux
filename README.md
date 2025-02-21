@@ -21,6 +21,6 @@ Start with 5 fish, a max of 20 fish, and skip the title screen
 
 `virtualfish -c 5 -m 20 -nt` 
 
-~Note: the order of the flags don't matter.~
+_Note: The order of the flags does not matter._
 
 ## Releases
