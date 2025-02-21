@@ -1,0 +1,6 @@
+-s <seed> => takes in a seed for the randomizer
+-c <count> => takes in the amount of starting fish
+-m <max> => takes in the max amount of fish to spawn
+
+-bw => runs in black and white mode
+-nt => skips the title screen

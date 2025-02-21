@@ -2,15 +2,15 @@ install_dir = /usr/local/bin
 code_dir = ./src
 build_dir = ./build
 
-virtualfish: $(build_dir)/main.o
+virtualfish: $(build_dir)/virtualfish.o
 	@echo "Linking..."
 	@gcc $^ -lncurses -o virtualfish
 	@echo "Done!"
 
-$(build_dir)/main.o: $(code_dir)/main.c $(code_dir)/main.h $(code_dir)/fish_graphic.h
+$(build_dir)/virtualfish.o: $(code_dir)/virtualfish.c $(code_dir)/virtualfish.h $(code_dir)/fish_graphic.h
 	@if [ ! -d $(build_dir) ]; then echo "Creating build directory..." && mkdir $(build_dir); fi
 	@echo "Compiling..."
-	@gcc -c $< -o $(build_dir)/main.o -Wall -Wextra -Werror
+	@gcc -c $< -o $(build_dir)/virtualfish.o -Wall -Wextra -Werror
 
 install: virtualfish
 	@echo "Installing..."

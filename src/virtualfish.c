@@ -1,16 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include <ncurses.h>
 
-#include "main.h"
+#include "virtualfish.h"
 #include "fish_graphic.h"
 
 struct SAND_ARRAY Sand;
+struct FLAG_DATA Flag_Vals;
 
-int main(void){ // int argc, char** argv
+int main(int argc, char** argv){
 
-    srand(time(NULL)); // seeding rng
+    set_flag_defaults();
+
+    handle_flags(argc, argv);
+
+    srand(Flag_Vals.seed);
 
     initscr();
 
@@ -20,26 +26,105 @@ int main(void){ // int argc, char** argv
         exit(0);
     }
 
-    if(has_colors() == FALSE){
-        endwin();
-        printf("Colors are not supported on this terminal.\n");
-        exit(0);
-    }
+    if(Flag_Vals.black_and_white == FALSE){
 
-    start_color();
-    init_color_pairs();
+        if(has_colors() == FALSE){
+            endwin();
+            printf("Colors are not supported on this terminal.\n");
+            exit(0);
+        }
+    
+        start_color();
+        init_color_pairs();
+
+    }
 
     game_on();
 
     init_env();
 
-    title_screen();
+    if(Flag_Vals.no_title == FALSE) { title_screen(); }
 
     update_loop();
 
     endwin();
 
     return 0;
+}
+
+void set_flag_defaults(){
+
+    Flag_Vals.black_and_white = FALSE;
+    Flag_Vals.no_title = FALSE;
+    Flag_Vals.max = 10;
+    Flag_Vals.count = 0;
+    Flag_Vals.seed = time(NULL);
+
+}
+
+void handle_flags(int argc, char** argv){
+
+    if(argc == 1){
+        return;
+    }
+
+    for(int i = 1; i < argc; i++){
+
+        if(argv[i][0] != '-'){
+            continue;
+        }
+
+        if(strcmp(argv[i], "-s") == 0 && (i + 1) != argc){
+
+            int tmp_seed = 0;
+            
+            if((tmp_seed = atoi(argv[i + 1])) != 0){
+                Flag_Vals.seed = tmp_seed;
+            }
+
+            continue;
+
+        }
+
+        if(strcmp(argv[i], "-c") == 0 && (i + 1) != argc){
+            
+            int tmp_count = 0;
+            
+            if((tmp_count = atoi(argv[i + 1])) >= 0){
+                Flag_Vals.count = tmp_count;
+            }
+
+            continue;
+
+        }
+
+        if(strcmp(argv[i], "-m") == 0 && (i + 1) != argc){
+            
+            int tmp_max = 0;
+            if((tmp_max = atoi(argv[i + 1])) > 0){
+                Flag_Vals.max = tmp_max;
+            }
+
+            continue;
+
+        }
+
+        if(strcmp(argv[i], "-bw") == 0){
+
+            Flag_Vals.black_and_white = TRUE;
+            continue;
+
+        }
+
+        if(strcmp(argv[i], "-nt") == 0){
+            
+            Flag_Vals.no_title = TRUE;
+            continue;
+        
+        }
+
+    }
+
 }
 
 void init_env(){ 
@@ -55,22 +140,22 @@ void init_env(){
 void title_screen(){
 
     const char* TITLE = "Virtualfish Redux";
-    const char* MSG = "Press any key to continue";
+    const char* MSG = "Press space to continue";
 
     WINDOW* title_win = newwin(8, 32, ((getmaxy(stdscr) / 2) - 4), ((getmaxx(stdscr) / 2) - 16));
     mvwaddnstr(title_win, 0, 8, TITLE, 18);
-    wattron(title_win, COLOR_PAIR(COLOR_CYAN));
+    if(Flag_Vals.black_and_white == FALSE) { wattron(title_win, COLOR_PAIR(COLOR_CYAN)); }
     mvwaddnstr(title_win, 1, 1, FISH_GRAPHIC[0], 30);
     mvwaddnstr(title_win, 2, 1, FISH_GRAPHIC[1], 30);
     mvwaddnstr(title_win, 3, 1, FISH_GRAPHIC[2], 30);
     mvwaddnstr(title_win, 4, 1, FISH_GRAPHIC[3], 30);
     mvwaddnstr(title_win, 5, 1, FISH_GRAPHIC[4], 30);
     mvwaddnstr(title_win, 6, 1, FISH_GRAPHIC[5], 30);
-    wattroff(title_win, COLOR_PAIR(COLOR_CYAN));
-    mvwaddnstr(title_win, 7, 4, MSG, 26);
+    if(Flag_Vals.black_and_white == FALSE) { wattroff(title_win, COLOR_PAIR(COLOR_CYAN)); }
+    mvwaddnstr(title_win, 7, 5, MSG, 24);
     wrefresh(title_win);
 
-    while(getch() == ERR);
+    while(getch() != 32);
 
     wclear(title_win);
     wrefresh(title_win);
@@ -97,6 +182,8 @@ void update_loop(){
             game_off();
 
             wgetnstr(input_win, cstr, 127);
+
+
 
             game_on();
 
@@ -133,7 +220,7 @@ void draw_water(){
 
     const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
 
-    attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD);
+    if(Flag_Vals.black_and_white == FALSE) { attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD); }
 
     for(int counter = 0; counter < SIZE; counter++){
 
@@ -161,7 +248,7 @@ void draw_water(){
 
     }
 
-    attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD);
+    if(Flag_Vals.black_and_white == FALSE) { attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD); }
 
 }
 
@@ -216,9 +303,11 @@ void draw_sand(){
 
     const int SAND_OFFSET = 2;
 
-    attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    if(Flag_Vals.black_and_white == FALSE) { attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD); }
+    
     mvprintw((getmaxy(stdscr) - SAND_OFFSET), 1, "%s", Sand.sand_pattern);
-    attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    
+    if(Flag_Vals.black_and_white == FALSE) { attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD); }
 
 }
 
@@ -251,3 +340,4 @@ void game_off(){
     curs_set(1);
 
 }
+
