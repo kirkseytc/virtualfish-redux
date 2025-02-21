@@ -4,7 +4,7 @@
 #include <ncurses.h>
 
 #include "main.h"
-#include "fish_graphic.h"
+#include "fish_graphic"
 
 struct SAND_ARRAY Sand;
 
@@ -13,6 +13,12 @@ int main(int argc, char** argv){
     srand(time(NULL)); // seeding rng
 
     initscr();
+
+    if(getmaxy(stdscr) < 12){
+        endwin();
+        printf("Terminal height is too short.\n");
+        exit(0);
+    }
 
     if(has_colors() == FALSE){
         endwin();
