@@ -12,8 +12,8 @@ Simply press space to continue.
 ![Screenshot of the Title Screen](imgs/title_screen.png)
 
 ### Commands
-To run a command type an ':' (or ';').  
-This will pause gameplay and bring up a input window.  
+To run a command type a ':' (or ';').  
+This will pause gameplay and bring up an input window.  
 In this window you are able to type in commands to interact with the tank.  
 
 |Command|Argument|Description|
