@@ -18,10 +18,10 @@ In this window you are able to type in commands to interact with the tank.
 
 |Command|Alias|Description|
 |:-|:-|:-|
-|`fish`|`f`|Spawns one fish or the amount specified in `<amount>` with either a random color or a specified color in `<color>`|
-|`max`|`m`|Spawns the maximum number of fish or sets the max to the amount passed in `<new_max>`|
+|`fish`|`f`|Spawns one fish|
+|`max`|`m`|Spawns the maximum number of fish|
 |`clear`|`c`|Clears the tank of all fish|
-|`seed`|`s`|Prints the seed so it can be copied then waits for the user to press space to resume game|
+|`seed`|`s`|Prints the seed|
 
 ### Flags
 |Flag|Argument|Description|
