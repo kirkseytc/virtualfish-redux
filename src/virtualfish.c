@@ -9,6 +9,7 @@
 
 struct SAND_ARRAY Sand;
 struct FLAG_DATA Flag_Vals;
+struct TANK Tank_Vals;
 
 int main(int argc, char** argv){
 
@@ -133,6 +134,7 @@ void init_env(){
     draw_water();
     gen_sand();
     draw_sand();
+    set_tank_bounds();
     refresh();
 
 }
@@ -170,9 +172,11 @@ void update_loop(){
 
         char input = getch();
 
-        if(input == ':'){
+        if(input == ':' || input == ';'){
 
-            char cstr[128];
+            const int INPUT_SIZE = 128;
+
+            char input_str[INPUT_SIZE];
 
             WINDOW* input_win = newwin(1, getmaxx(stdscr) - 2, getmaxy(stdscr) - 2, 1);
             waddch(input_win, ':');
@@ -181,9 +185,9 @@ void update_loop(){
 
             game_off();
 
-            wgetnstr(input_win, cstr, 127);
+            wgetnstr(input_win, input_str, INPUT_SIZE - 1);
 
-
+            // TODO: String Parser
 
             game_on();
 
@@ -311,6 +315,16 @@ void draw_sand(){
 
 }
 
+void set_tank_bounds(){
+
+    Tank_Vals.min.x = 1;
+    Tank_Vals.min.y = 2;
+
+    Tank_Vals.max.x = getmaxx(stdscr) - 2;
+    Tank_Vals.max.y = getmaxy(stdscr) - 3;
+
+}
+
 void init_color_pairs(){
 
     init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
@@ -341,3 +355,23 @@ void game_off(){
 
 }
 
+struct FISH* create_fish(int color){
+
+    const int SPEED = 5;
+
+    struct FISH* new_fish = malloc(sizeof(struct FISH));
+
+    new_fish->color = color;
+
+    new_fish->location.x = rand() % (Tank_Vals.max.x - Tank_Vals.min.x) + Tank_Vals.min.x;
+    new_fish->location.y = rand() % (Tank_Vals.max.y - Tank_Vals.min.y) + Tank_Vals.min.y;
+
+    new_fish->destination.x = rand() % (Tank_Vals.max.x - Tank_Vals.min.x) + Tank_Vals.min.x;
+    new_fish->destination.y = rand() % (Tank_Vals.max.y - Tank_Vals.min.y) + Tank_Vals.min.y;
+
+    new_fish->velocity.x = (float)((new_fish->destination.x - new_fish->location.x)/(SPEED));
+    new_fish->velocity.y = (float)((new_fish->destination.y - new_fish->location.y)/(SPEED));
+
+    return new_fish;
+
+}

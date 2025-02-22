@@ -23,13 +23,43 @@ struct FLAG_DATA {
 
 };
 
+struct POINT2D {
+
+    int x;
+    int y;
+
+};
+
+struct TANK {
+
+    struct POINT2D min;
+    struct POINT2D max;
+
+};
+
+struct VECTOR2 {
+
+    float x;
+    float y;
+
+};
+
+struct FISH {
+
+    int color;
+    struct POINT2D location;
+    struct POINT2D destination;
+    struct VECTOR2 velocity;
+
+};
+
 /**
  * initializes global var Flag_Vals
  */
 void set_flag_defaults();
 
 /**
- * Handles argc & argv
+ * Handles argc & argv flags
  */
 void handle_flags(int argc, char** argv);
 
@@ -68,6 +98,8 @@ void gen_sand();
  */
 void draw_sand();
 
+void set_tank_bounds();
+
 /**
  * Initilizes the 8 basic color pairs for color use
  */
@@ -82,5 +114,10 @@ void game_on();
  * Turns off terminal modifers for the game mode
  */
 void game_off();
+
+/**
+ * allocates a struct fish and sets it color to color passed and returns the ptr
+ */
+struct FISH* create_fish(int color);
 
 #endif
