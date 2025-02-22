@@ -16,12 +16,12 @@ To run a command type a ':' (or ';').
 This will pause gameplay and bring up an input window.  
 In this window you are able to type in commands to interact with the tank.  
 
-|Command|Alias|Argument(s)|Description|
-|:-|:-|:-|:-|
-|`fish`|`f`|`<amount> <color>`|Spawns one fish or the amount specified in `<amount>` with either a random color or a specified color in `<color>`|
-|`max`|`m`|`<new_max>`|Spawns the maximum number of fish or sets the max to the amount passed in `<new_max>`|
-|`clear`|`c`|N/A|Clears the tank of all fish|
-|`seed`|`s`|N/A|prints the seed so it can be copied then waits for the user to press space to resume game|
+|Command|Alias|Description|
+|:-|:-|:-|
+|`fish`|`f`|Spawns one fish or the amount specified in `<amount>` with either a random color or a specified color in `<color>`|
+|`max`|`m`|Spawns the maximum number of fish or sets the max to the amount passed in `<new_max>`|
+|`clear`|`c`|Clears the tank of all fish|
+|`seed`|`s`|Prints the seed so it can be copied then waits for the user to press space to resume game|
 
 ### Flags
 |Flag|Argument|Description|
