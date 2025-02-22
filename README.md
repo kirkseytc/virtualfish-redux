@@ -37,7 +37,7 @@ _Note: The order of the flags does not matter._
 
 ## Releases
 
-## Why does redux exist?
+## Why Does Redux Exist?
 Redux exists because I want to have a crack at this idea again with
 new understanding of programming with C/C++ and with a vision of 
 what the final product will look like from the beginning.
