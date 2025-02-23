@@ -2,9 +2,25 @@
 This is a "redux" of the [virtualfish project](https://www.github.com/kirkseytc/virtualfish), remaking it from scratch and impementing new features.
 
 ## Install
+### Windows
+Currently there is no native Windows port, but you can use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) with the linux instructions.
+### MacOS
+Currently there is no planned native MacOS port.
+### Linux
+> If you do not have ncurses-6.4 installed already, either build it from [source](https://invisible-island.net/ncurses/#download) or install it with your package manager.
+
+> Example with Debian: `sudo apt-get install libncurses-dev`
+
+Download the lastest release, unzip it and change directory into the newly created folder.
+
+Then run `sudo make install` to build and install Virtualfish Redux to your /usr/local/bin directory.
+
+At this point, if you want to, you can remove the created folder and .zip file downloaded.
+
+_Note: if you have the non-redux version of Virtualfish installed, this will overwrite the install_
 
 ## Running
-To run virtualfish-redux either run `virtualfish` or `vfish`.
+To run Virtualfish Redux either run `virtualfish` or `vfish`.
 
 After starting execution you will be greeted with this title screen.  
 Simply press space to continue.
@@ -22,15 +38,18 @@ In this window you are able to type in commands to interact with the tank.
 |`max`|`m`|Spawns the maximum number of fish|
 |`clear`|`c`|Clears the tank of all fish|
 |`seed`|`s`|Prints the seed|
+|`quit`|`q`|Quits the game|
+
+_Note: Commands are not case sensitive._
 
 ### Flags
-|Flag|Argument|Description|
-|:-|:-|:-|
-|`-s`|`<seed>`|Seeds the randomizer to the amount passed in `<seed>`|
-|`-c`|`<count>`|Sets the starting amount of fish to the amount passed in `<count>`|
-|`-m`|`<max>`|Sets the max amount of fish possible to the amount passed in `<max>`|
-|`-bw`|N/A|Starts in Black and White mode|
-|`-nt`|N/A|Skips the title screen|
+|Option|Description|
+|:-|:-|
+|`-s <seed>`|Seeds the randomizer to the amount passed in `<seed>`|
+|`-c <count>`|Sets the starting amount of fish to the amount passed in `<count>`|
+|`-m <max>`|Sets the max amount of fish possible to the amount passed in `<max>`|
+|`-bw`|Starts in Black and White mode|
+|`-nt`|Skips the title screen|
 
 Example: 
 Start with 5 fish, a max of 20 fish, and skip the title screen

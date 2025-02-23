@@ -6,6 +6,8 @@ enum Command {
     MAX,
     CLEAR,
     SEED,
+    QUIT,
+    _BLANK
 };
 
 /**
@@ -75,7 +77,7 @@ void game_mode_on();
  */
 void game_mode_off();
 
-enum Command parse_command(char* parse_string, int parse_string_size);
+enum Command parse_command(char* parse_string, size_t parse_string_size);
 
 void itocstr(int integer, char* string, size_t str_size);
 

@@ -1,8 +1,9 @@
 // System Libraries
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <time.h> // for time() to seed srand()
 #include <string.h>
+#include <ctype.h> // for toupper()
 #include <ncurses.h>
 
 // Local Headers
@@ -12,6 +13,7 @@
 // Local Macros
 #define TANK_BOUND_X 0
 #define TANK_BOUND_Y 1
+#define SPACE_KEY 32
 
 // Gloabl Variables
 static unsigned int seed = 0;
@@ -171,7 +173,7 @@ void title_screen(){
     mvwaddnstr(title_win, 7, 5, MSG, 24);
     wrefresh(title_win);
 
-    while(getch() != 32);
+    while(getch() != SPACE_KEY);
 
     wclear(title_win);
     wrefresh(title_win);
@@ -198,39 +200,44 @@ int update(){
 
         game_mode_off();
         wgetnstr(input_win, input_str, input_str_size - 1);
+        game_mode_on();
 
         switch(parse_command(input_str, input_str_size)){
 
             case FISH:
-
-                waddnstr(input_win, "New Fish Added", 15);
-                napms(1000);
+                // todo: spawn fish
+                waddnstr(input_win, "New Fish Spawned", 17);
+                wrefresh(input_win);
+                napms(750);
                 break;
             case MAX:
-                waddnstr(input_win, "New Fish Added", 15);
-                napms(1000);
+                // todo: spawn max fish
+                waddnstr(input_win, "Max Fish Spawned", 17);
+                wrefresh(input_win);
+                napms(750);
                 break;
             case CLEAR:
-                waddnstr(input_win, "New Fish Added", 15);
-                napms(1000);
+                // todo: clear fish
+                waddnstr(input_win, "Fish Cleared", 13);
+                wrefresh(input_win);
+                napms(750);
                 break;
             case SEED:
                 char parsed_seed[12] = {0};
-                itocstr(seed, parsed_seed, 12);
+                itocstr((signed int)seed, parsed_seed, 12);
                 waddnstr(input_win, parsed_seed, 12);
-                napms(1000);
+                waddnstr(input_win, "\tPress space to resume game...", 31);
+                while(!(wgetch(input_win) == SPACE_KEY));
                 break;
-
+            case QUIT:
+                return 1;
+            case _BLANK:
+                break;
         }
 
-        game_mode_on();
         delwin(input_win);
         draw_sand(NULL);
 
-    }
-
-    if(input == 'q'){
-        return 1;
     }
 
     // render updates
@@ -399,8 +406,28 @@ void game_mode_off(){
 
 }
 
-enum Command parse_command(char* parse_string, int parse_string_size){
+enum Command parse_command(char* parse_string, size_t parse_string_size){
 
+    if(parse_string == NULL || parse_string_size == 0){
+        return _BLANK;
+    }
+
+    parse_string[0] = toupper(parse_string[0]);
+
+    switch(parse_string[0]){
+        case 'F':
+            return FISH;
+        case 'M':
+            return MAX;
+        case 'C':
+            return CLEAR;
+        case 'S':
+            return SEED;
+        case 'Q':
+            return QUIT;
+    }
+
+    return _BLANK;
 }
 
 void itocstr(int integer, char* string, size_t str_size){
@@ -411,7 +438,7 @@ void itocstr(int integer, char* string, size_t str_size){
 
     string[str_size - 1] = '\0';
 
-    for(int index = 0; index < str_size - 1; index++){
+    for(size_t index = 0; index < str_size - 1; index++){
         
         if(index == 0 && integer < 0){
             string[index] = '-';
