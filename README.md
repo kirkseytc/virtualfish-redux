@@ -24,7 +24,7 @@ To run Virtualfish Redux either run `virtualfish` or `vfish`.
 After starting execution you will be greeted with this title screen.  
 Simply press space to continue.
 
-<img src="imgs/title_screen.png" alt="Screenshot of the Title Screen" width="600">
+<img src="imgs/title_screen.png" alt="Screenshot of the Title Screen" width="540">
 
 ### Commands
 To run a command type a ':' (or ';').  
