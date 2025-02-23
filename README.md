@@ -7,8 +7,8 @@ Currently there is no native Windows port, but you can use [WSL](https://learn.m
 ### MacOS:
 Currently there is no planned native MacOS port.
 ### Linux:
-> If you do not have ncurses-6.4 installed already, either build it from [source](https://invisible-island.net/ncurses/#download) or install it with your package manager.
-> (example with Debian: `sudo apt-get install libncurses-dev`)
+> If you do not have ncurses-6.4 installed already, either build it from [source](https://invisible-island.net/ncurses/#download) or install it with your package manager
+> (example with Debian: `sudo apt-get install libncurses-dev`).
 
 Download the lastest [release](https://github.com/kirkseytc/virtualfish-redux/releases), unzip it, and change directory into the newly created folder.
 
