@@ -3,12 +3,12 @@ This is a "redux" of the [virtualfish project](https://www.github.com/kirkseytc/
 
 ## Install
 ### Windows:
-Currently there is no native Windows port, but you can use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) with the [Linux](./README.md/#linux) instructions.
+Currently there is no native Windows port, but you can use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) with the [Linux](#linux) instructions.
 ### MacOS:
 Currently there is no planned native MacOS port.
 ### Linux:
 > If you do not have ncurses-6.4 installed already, either build it from [source](https://invisible-island.net/ncurses/#download) or install it with your package manager.
-> Example with Debian: `sudo apt-get install libncurses-dev`
+> (example with Debian: `sudo apt-get install libncurses-dev`)
 
 Download the lastest [release](https://github.com/kirkseytc/virtualfish-redux/releases), unzip it, and change directory into the newly created folder.
 
@@ -24,7 +24,7 @@ To run Virtualfish Redux either run `virtualfish` or `vfish`.
 After starting execution you will be greeted with this title screen.  
 Simply press space to continue.
 
-<img src="imgs/title_screen.png" alt="Screenshot of the Title Screen" width="720">
+<img src="imgs/title_screen.png" alt="Screenshot of the Title Screen" width="600">
 
 ### Commands
 To run a command type a ':' (or ';').  
