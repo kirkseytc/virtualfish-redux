@@ -1,15 +1,27 @@
+// System Libraries
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
 #include <ncurses.h>
 
+// Local Headers
 #include "virtualfish.h"
 #include "fish_graphic.h"
 
-struct SAND_ARRAY Sand;
-struct FLAG_DATA Flag_Vals;
-struct TANK Tank_Vals;
+// Local Macros
+#define TANK_BOUND_X 0
+#define TANK_BOUND_Y 1
+
+// Gloabl Variables
+static unsigned int seed = 0;
+static unsigned int count = 0;
+static unsigned int max = 0;
+static unsigned char black_and_white = 0;
+static unsigned char no_title_scr = 0;
+
+static unsigned int tank_min_bounds[2] = {0,0};
+static unsigned int tank_max_bounds[2] = {0,0};
 
 int main(int argc, char** argv){
 
@@ -17,7 +29,7 @@ int main(int argc, char** argv){
 
     handle_flags(argc, argv);
 
-    srand(Flag_Vals.seed);
+    srand(seed);
 
     initscr();
 
@@ -27,9 +39,8 @@ int main(int argc, char** argv){
         exit(0);
     }
 
-    if(Flag_Vals.black_and_white == FALSE){
-
-        if(has_colors() == FALSE){
+    if(black_and_white == 0){
+        if(has_colors() == 0){
             endwin();
             printf("Colors are not supported on this terminal.\n");
             exit(0);
@@ -37,16 +48,16 @@ int main(int argc, char** argv){
     
         start_color();
         init_color_pairs();
-
     }
 
-    game_on();
+    game_mode_on();
 
     init_env();
 
-    if(Flag_Vals.no_title == FALSE) { title_screen(); }
+    if(no_title_scr == 0) title_screen();
 
-    update_loop();
+    int update_code = 0;
+    while((update_code = update()) == 0);
 
     endwin();
 
@@ -55,11 +66,11 @@ int main(int argc, char** argv){
 
 void set_flag_defaults(){
 
-    Flag_Vals.black_and_white = FALSE;
-    Flag_Vals.no_title = FALSE;
-    Flag_Vals.max = 10;
-    Flag_Vals.count = 0;
-    Flag_Vals.seed = time(NULL);
+    black_and_white = 0;
+    no_title_scr = 0;
+    max = 10;
+    count = 0;
+    seed = time(NULL);
 
 }
 
@@ -80,7 +91,7 @@ void handle_flags(int argc, char** argv){
             int tmp_seed = 0;
             
             if((tmp_seed = atoi(argv[i + 1])) != 0){
-                Flag_Vals.seed = tmp_seed;
+                seed = tmp_seed;
             }
 
             continue;
@@ -92,7 +103,7 @@ void handle_flags(int argc, char** argv){
             int tmp_count = 0;
             
             if((tmp_count = atoi(argv[i + 1])) >= 0){
-                Flag_Vals.count = tmp_count;
+                count = tmp_count;
             }
 
             continue;
@@ -103,7 +114,7 @@ void handle_flags(int argc, char** argv){
             
             int tmp_max = 0;
             if((tmp_max = atoi(argv[i + 1])) > 0){
-                Flag_Vals.max = tmp_max;
+                max = tmp_max;
             }
 
             continue;
@@ -112,14 +123,14 @@ void handle_flags(int argc, char** argv){
 
         if(strcmp(argv[i], "-bw") == 0){
 
-            Flag_Vals.black_and_white = TRUE;
+            black_and_white = 1;
             continue;
 
         }
 
         if(strcmp(argv[i], "-nt") == 0){
             
-            Flag_Vals.no_title = TRUE;
+            no_title_scr = 1;
             continue;
         
         }
@@ -132,8 +143,7 @@ void init_env(){
 
     draw_box();
     draw_water();
-    gen_sand();
-    draw_sand();
+    draw_sand(gen_sand());
     set_tank_bounds();
     refresh();
 
@@ -146,14 +156,18 @@ void title_screen(){
 
     WINDOW* title_win = newwin(8, 32, ((getmaxy(stdscr) / 2) - 4), ((getmaxx(stdscr) / 2) - 16));
     mvwaddnstr(title_win, 0, 8, TITLE, 18);
-    if(Flag_Vals.black_and_white == FALSE) { wattron(title_win, COLOR_PAIR(COLOR_CYAN)); }
+
+    if (black_and_white == 0) wattron(title_win, COLOR_PAIR(COLOR_CYAN));
+    
     mvwaddnstr(title_win, 1, 1, FISH_GRAPHIC[0], 30);
     mvwaddnstr(title_win, 2, 1, FISH_GRAPHIC[1], 30);
     mvwaddnstr(title_win, 3, 1, FISH_GRAPHIC[2], 30);
     mvwaddnstr(title_win, 4, 1, FISH_GRAPHIC[3], 30);
     mvwaddnstr(title_win, 5, 1, FISH_GRAPHIC[4], 30);
     mvwaddnstr(title_win, 6, 1, FISH_GRAPHIC[5], 30);
-    if(Flag_Vals.black_and_white == FALSE) { wattroff(title_win, COLOR_PAIR(COLOR_CYAN)); }
+    
+    if(black_and_white == 0) wattroff(title_win, COLOR_PAIR(COLOR_CYAN)); 
+    
     mvwaddnstr(title_win, 7, 5, MSG, 24);
     wrefresh(title_win);
 
@@ -166,44 +180,64 @@ void title_screen(){
 
 }
 
-void update_loop(){
+int update(){
 
-    while(true){
+    // read input
 
-        char input = getch();
+    char input = getch();
 
-        if(input == ':' || input == ';'){
+    // parse input
 
-            const int INPUT_SIZE = 128;
+    if(input == ':' || input == ';'){
 
-            char input_str[INPUT_SIZE];
+        int input_str_size = 128;
+        char input_str[input_str_size];
 
-            WINDOW* input_win = newwin(1, getmaxx(stdscr) - 2, getmaxy(stdscr) - 2, 1);
-            waddch(input_win, ':');
+        WINDOW* input_win = newwin(1, getmaxx(stdscr) - 2, getmaxy(stdscr) - 2, 1);
+        waddch(input_win, ':');
 
-            wrefresh(input_win);
+        game_mode_off();
+        wgetnstr(input_win, input_str, input_str_size - 1);
 
-            game_off();
+        switch(parse_command(input_str, input_str_size)){
 
-            wgetnstr(input_win, input_str, INPUT_SIZE - 1);
+            case FISH:
 
-            // TODO: String Parser
-
-            game_on();
-
-            delwin(input_win);
-
-            draw_sand();
+                waddnstr(input_win, "New Fish Added", 15);
+                napms(1000);
+                break;
+            case MAX:
+                waddnstr(input_win, "New Fish Added", 15);
+                napms(1000);
+                break;
+            case CLEAR:
+                waddnstr(input_win, "New Fish Added", 15);
+                napms(1000);
+                break;
+            case SEED:
+                char parsed_seed[12] = {0};
+                itocstr(seed, parsed_seed, 12);
+                waddnstr(input_win, parsed_seed, 12);
+                napms(1000);
+                break;
 
         }
 
-        if(input == 'q'){
-            break;
-        }
-
-        refresh();
+        game_mode_on();
+        delwin(input_win);
+        draw_sand(NULL);
 
     }
+
+    if(input == 'q'){
+        return 1;
+    }
+
+    // render updates
+
+    refresh();
+
+    return 0;
 
 }
 
@@ -224,7 +258,7 @@ void draw_water(){
 
     const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
 
-    if(Flag_Vals.black_and_white == FALSE) { attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD); }
+    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD);
 
     for(int counter = 0; counter < SIZE; counter++){
 
@@ -252,23 +286,24 @@ void draw_water(){
 
     }
 
-    if(Flag_Vals.black_and_white == FALSE) { attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD); }
+    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD);
 
 }
 
-void gen_sand(){
+char* gen_sand(){
 
-    const char SAND_CHR[] = {'-', '.', '_'};
-    const int SAND_OFFSET_X = 2;
+    char sand_chr[] = {'-', '.', '_'};
+    int sand_offset_x = 2;
     
-    const unsigned int SIZE = getmaxx(stdscr) - SAND_OFFSET_X;
+    unsigned int size = getmaxx(stdscr) - sand_offset_x;
     
-    Sand.size = SIZE + 1; // plus 1 for the '\0'
-    Sand.sand_pattern = malloc(sizeof(char) * Sand.size);
+    unsigned int sand_pattern_size = size + 1; // plus 1 for the null terminator
+
+    char* sand_pattern = malloc(sizeof(char) * sand_pattern_size);
 
     int ch_index = 1;
 
-    for(unsigned int i = 0; i < SIZE; i++){
+    for(unsigned int i = 0; i < size; i++){
 
         /*
             0 = stay same
@@ -295,33 +330,42 @@ void gen_sand(){
                 break;
         }
 
-        Sand.sand_pattern[i] = SAND_CHR[ch_index];
+        sand_pattern[i] = sand_chr[ch_index];
         
     }
 
-    Sand.sand_pattern[Sand.size - 1] = '\0';
+    sand_pattern[sand_pattern_size - 1] = '\0';
+
+    return sand_pattern;
 
 }
 
-void draw_sand(){
+void draw_sand(char* sand_pat){
 
-    const int SAND_OFFSET = 2;
+    static char* sand_pattern = NULL;
 
-    if(Flag_Vals.black_and_white == FALSE) { attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD); }
+    if(sand_pat != NULL){
+        free(sand_pattern);
+        sand_pattern = sand_pat;
+    }
+
+    int sand_offset = 2;
+
+    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
     
-    mvprintw((getmaxy(stdscr) - SAND_OFFSET), 1, "%s", Sand.sand_pattern);
+    mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
     
-    if(Flag_Vals.black_and_white == FALSE) { attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD); }
+    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
 
 }
 
 void set_tank_bounds(){
 
-    Tank_Vals.min.x = 1;
-    Tank_Vals.min.y = 2;
+    tank_min_bounds[TANK_BOUND_X] = 1;
+    tank_min_bounds[TANK_BOUND_Y] = 2;
 
-    Tank_Vals.max.x = getmaxx(stdscr) - 2;
-    Tank_Vals.max.y = getmaxy(stdscr) - 3;
+    tank_max_bounds[TANK_BOUND_X] = getmaxx(stdscr) - 2;
+    tank_max_bounds[TANK_BOUND_Y] = getmaxy(stdscr) - 3;
 
 }
 
@@ -337,16 +381,16 @@ void init_color_pairs(){
 
 }
 
-void game_on(){
+void game_mode_on(){
 
     cbreak(); 
     noecho(); 
-    timeout(16); 
+    timeout(10); 
     curs_set(0);
 
 }
 
-void game_off(){
+void game_mode_off(){
 
     nocbreak(); 
     echo(); 
@@ -355,23 +399,60 @@ void game_off(){
 
 }
 
-struct FISH* create_fish(int color){
+enum Command parse_command(char* parse_string, int parse_string_size){
 
-    const int SPEED = 5;
+}
 
-    struct FISH* new_fish = malloc(sizeof(struct FISH));
+void itocstr(int integer, char* string, size_t str_size){
 
-    new_fish->color = color;
+    if(string == NULL || str_size == 0){
+        return;
+    }
 
-    new_fish->location.x = rand() % (Tank_Vals.max.x - Tank_Vals.min.x) + Tank_Vals.min.x;
-    new_fish->location.y = rand() % (Tank_Vals.max.y - Tank_Vals.min.y) + Tank_Vals.min.y;
+    string[str_size - 1] = '\0';
 
-    new_fish->destination.x = rand() % (Tank_Vals.max.x - Tank_Vals.min.x) + Tank_Vals.min.x;
-    new_fish->destination.y = rand() % (Tank_Vals.max.y - Tank_Vals.min.y) + Tank_Vals.min.y;
+    for(int index = 0; index < str_size - 1; index++){
+        
+        if(index == 0 && integer < 0){
+            string[index] = '-';
+            integer *= -1;
+            continue;
+        }
 
-    new_fish->velocity.x = (float)((new_fish->destination.x - new_fish->location.x)/(SPEED));
-    new_fish->velocity.y = (float)((new_fish->destination.y - new_fish->location.y)/(SPEED));
+        string[index] = integer % 10 + '0';
 
-    return new_fish;
+        integer /= 10;
+
+    }
+
+    int start_index = 0;
+    int end_index = str_size - 2;
+
+    if(string[0] == '-') start_index++;
+
+    while(end_index > start_index){
+
+        // swaping algorithm from https://www.geeksforgeeks.org/swap-two-numbers-without-using-temporary-variable/#using-arithmetic-operators
+
+        string[start_index] = string[start_index] + string[end_index];
+        string[end_index] = string[start_index] - string[end_index];
+        string[start_index] = string[start_index] - string[end_index];
+
+        start_index++;
+        end_index--;
+
+    }
+
+}
+
+int rand_from_range(int min, int max){
+
+    if(max < min){
+        return 0;
+    }
+
+    int mod = (max + 1) - min;
+
+    return rand() % mod + min;
 
 }

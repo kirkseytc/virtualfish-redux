@@ -1,56 +1,11 @@
 #ifndef VIRTUALFISH_H
 #define VIRTUALFISH_H
 
-/**
- * Data structure to hold sand graphics data
- */
-struct SAND_ARRAY {
-    char* sand_pattern;
-    unsigned int size;
-};
-
-/**
- * Data structure to hold data parsed by flag logic.
- */
-struct FLAG_DATA {
-
-    unsigned int seed;
-    unsigned int count;
-    unsigned int max;
-
-    unsigned char black_and_white;
-    unsigned char no_title;
-
-};
-
-struct POINT2D {
-
-    int x;
-    int y;
-
-};
-
-struct TANK {
-
-    struct POINT2D min;
-    struct POINT2D max;
-
-};
-
-struct VECTOR2 {
-
-    float x;
-    float y;
-
-};
-
-struct FISH {
-
-    int color;
-    struct POINT2D location;
-    struct POINT2D destination;
-    struct VECTOR2 velocity;
-
+enum Command {
+    FISH,
+    MAX,
+    CLEAR,
+    SEED,
 };
 
 /**
@@ -61,7 +16,7 @@ void set_flag_defaults();
 /**
  * Handles argc & argv flags
  */
-void handle_flags(int argc, char** argv);
+void handle_flags(int, char**);
 
 /**
  * Initlizes tank grpahics
@@ -74,9 +29,9 @@ void init_env();
 void title_screen();
 
 /**
- * Runs the game loop
+ * Runs the game loop and return 0 upon success
  */
-void update_loop();
+int update();
 
 /**
  * Draws a bolded box to stdscr
@@ -89,15 +44,20 @@ void draw_box();
 void draw_water();
 
 /**
- * Generates the sand pattern and stores it in the global sand var
+ * Generates the sand pattern in an heap alloctaed c string and returns the pointer.
  */
-void gen_sand();
+char* gen_sand();
 
 /**
- * Draws the sand pattern stored in the global sand var
+ * Draws the sand pattern stored in the c string passed in and uses it statically, unless a new string is passed in.
+ * 
+ * NOTE: Whatever c string that is stored in the static varibale will have free() called upon it when a new one is passed.
  */
-void draw_sand();
+void draw_sand(char*);
 
+/**
+ * 
+ */
 void set_tank_bounds();
 
 /**
@@ -108,16 +68,17 @@ void init_color_pairs();
 /**
  * Turns on terminal modifers for the game mode
  */
-void game_on();
+void game_mode_on();
 
 /**
  * Turns off terminal modifers for the game mode
  */
-void game_off();
+void game_mode_off();
 
-/**
- * allocates a struct fish and sets it color to color passed and returns the ptr
- */
-struct FISH* create_fish(int color);
+enum Command parse_command(char* parse_string, int parse_string_size);
+
+void itocstr(int integer, char* string, size_t str_size);
+
+int rand_from_range(int min, int max);
 
 #endif
