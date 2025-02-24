@@ -10,7 +10,7 @@ virtualfish: $(build_dir)/virtualfish.o
 $(build_dir)/virtualfish.o: $(code_dir)/virtualfish.c $(code_dir)/virtualfish.h $(code_dir)/fish_graphic.h
 	@if [ ! -d $(build_dir) ]; then echo "Creating build directory..." && mkdir $(build_dir); fi
 	@echo "Compiling..."
-	@gcc -c $< -o $(build_dir)/virtualfish.o -Wall -Wextra -Werror
+	@gcc -c $< -o $(build_dir)/virtualfish.o -Wall
 
 install: virtualfish
 	@echo "Installing..."
@@ -23,5 +23,5 @@ uninstall:
 
 clean:
 	@if [ -d $(build_dir) ]; then echo "Cleaning objects..." && rm -rf $(build_dir); fi;
-	@if [ -f virtualfish ]; then echo "Cleaning executable..." && rm virtualfish; fi;
+	@if [ -f virtualfish ]; then echo "Cleaning executables..." && rm virtualfish; fi;
 	@echo "Done!"

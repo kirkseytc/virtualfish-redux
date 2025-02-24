@@ -434,7 +434,7 @@ void set_tank_values(){
     tank_min_bounds[TANK_X] = 1;
     tank_min_bounds[TANK_Y] = 2;
 
-    tank_max_bounds[TANK_X] = getmaxx(stdscr) - 2 - FISH_G_SIZE;
+    tank_max_bounds[TANK_X] = getmaxx(stdscr) - 2;
     tank_max_bounds[TANK_Y] = getmaxy(stdscr) - 3;
 
     tank_size[TANK_X] = tank_max_bounds[TANK_X] - tank_min_bounds[TANK_X] + 1;
@@ -458,7 +458,7 @@ void game_mode_on(){
 
     cbreak(); 
     noecho(); 
-    timeout(10); 
+    timeout(100); 
     curs_set(0);
 
 }
@@ -538,34 +538,20 @@ void itocstr(int integer, char* string, size_t str_size){
 
 }
 
-int rand_from_range(int min, int max){
-
-    if(max < min){
-        return 0;
-    }
-
-    int mod = (max + 1) - min;
-
-    return rand() % mod + min;
-
-}
-
 Fish create_fish(){
 
     static Fish this;
 
-    this.pos_x = rand_from_range(tank_min_bounds[TANK_X], tank_max_bounds[TANK_X]);
-    this.pos_y = rand_from_range(tank_min_bounds[TANK_Y], tank_max_bounds[TANK_Y]);
+    this.pos_x = ((tank_size[TANK_X] - FISH_G_SIZE) / 2) + tank_min_bounds[TANK_X];
+    this.pos_y = (tank_size[TANK_Y] / 2) + tank_min_bounds[TANK_Y];
 
-    this.dest_pos_x = rand_from_range(tank_min_bounds[TANK_X], tank_max_bounds[TANK_X]);
-    this.dest_pos_y = rand_from_range(tank_min_bounds[TANK_Y], tank_max_bounds[TANK_Y]);
+    this.direction.isNorth = rand() % 2;
+    this.direction.isEast = rand() % 2;
+    this.direction.onlyHorizontal = rand() % 2;
 
-    this.speed = 60;
+    this.counter = (rand() % 9) + 1;
 
-    this.vel_x = (float)((this.dest_pos_x - this.pos_x) / this.speed);
-    this.vel_y = (float)((this.dest_pos_y - this.pos_y) / this.speed);
-
-    this.color = (enum Color)(rand() % (enum Color)SIZE);
+    this.color = (enum Color)(rand() % COLOR_TOTAL);
 
     return this;
 
@@ -582,25 +568,33 @@ void simulate(Fish* fishes, size_t fish_count){
 
         Fish fish = fishes[i];
 
-        fish = sim_oob(fish);
+        fish = simulate_OutOfBoundsHandle(fish);
 
-        if((fish.dest_pos_x == (int)fish.pos_x) && (fish.dest_pos_y == (int)fish.pos_y)){
+        if(fish.counter == 0){
 
-            fish.pos_x = fish.dest_pos_x;
-            fish.pos_y = fish.dest_pos_y;
+            fish.direction = simulate_NextDirection(fish.direction);
+            fish.counter = create_fish().counter;
 
-            fish.dest_pos_x = create_fish().dest_pos_x;
-            fish.dest_pos_y = create_fish().dest_pos_y;
-
-            fish.vel_x = (float)((fish.dest_pos_x - fish.pos_x) / fish.speed);
-            fish.vel_y = (float)((fish.dest_pos_y - fish.pos_y) / fish.speed);
-
-        } else {
-
-            fish.pos_x += fish.vel_x;
-            fish.pos_y += fish.vel_y;
-        
         }
+
+        if(fish.direction.isEast){
+            fish.pos_x++;
+        } else {
+            fish.pos_x--;
+        }
+
+        if(fish.direction.onlyHorizontal == 0){
+            
+            if(fish.direction.isNorth){
+                fish.pos_y--;
+            } else {
+                fish.pos_y++;
+            }
+
+        } 
+
+        fish.counter--;
+
 
         fishes[i] = fish;
 
@@ -608,29 +602,39 @@ void simulate(Fish* fishes, size_t fish_count){
 
 }
 
-Fish sim_oob(Fish fish){
+Fish simulate_OutOfBoundsHandle(Fish fish){
 
-    if((unsigned int)fish.pos_x > tank_max_bounds[TANK_X]){
-        fish.pos_x = tank_max_bounds[TANK_X];
-        fish.dest_pos_x = (int)fish.pos_x;
+    if(fish.pos_x > (int)(tank_max_bounds[TANK_X] - FISH_G_SIZE)){
+        fish.pos_x = tank_max_bounds[TANK_X] - FISH_G_SIZE;
+        fish.counter = 0;
     }
 
-    if((unsigned int)fish.pos_x < tank_min_bounds[TANK_X]){
-        fish.pos_x = tank_min_bounds[TANK_X];
-        fish.dest_pos_x = (int)fish.pos_x;
-    }
-
-    if((unsigned int)fish.pos_y > tank_max_bounds[TANK_Y]){
+    if(fish.pos_y > (int)tank_max_bounds[TANK_Y]){
         fish.pos_y = tank_max_bounds[TANK_Y];
-        fish.dest_pos_y = (int)fish.pos_y;
+        fish.counter = 0;
     }
 
-    if((unsigned int)fish.pos_y < tank_min_bounds[TANK_Y]){
+    if(fish.pos_x < (int)tank_min_bounds[TANK_X]){
+        fish.pos_x = tank_min_bounds[TANK_X];
+        fish.counter = 0;
+    }
+
+    if(fish.pos_y < (int)tank_min_bounds[TANK_Y]){
         fish.pos_y = tank_min_bounds[TANK_Y];
-        fish.dest_pos_y = (int)fish.pos_y;
+        fish.counter = 0;
     }
 
     return fish;
+
+}
+
+Direction simulate_NextDirection(Direction direction){
+
+    direction.isEast = rand() % 2; 
+    direction.isNorth = rand() % 2;
+    direction.onlyHorizontal = rand() % 2;
+
+    return direction;
 
 }
 
@@ -645,7 +649,7 @@ void render(Fish* fishes, size_t fish_count){
         if(black_and_white == 0) wattron(tank, COLOR_PAIR(fishes[i].color));
 
         mvwaddnstr(tank, fishes[i].pos_y, fishes[i].pos_x, FISH_G_FR, FISH_G_SIZE);
-
+        
         if(black_and_white == 0) wattroff(tank, COLOR_PAIR(fishes[i].color));
 
     }

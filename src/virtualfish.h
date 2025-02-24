@@ -1,7 +1,8 @@
 #ifndef VIRTUALFISH_H
 #define VIRTUALFISH_H
 
-
+#define COMMAND_TOTAL 6
+#define COLOR_TOTAL 8
 
 enum Command {
     FISH,
@@ -21,21 +22,24 @@ enum Color {
     MAGENTA,
     CYAN,
     WHITE,
-    SIZE
 };
+
+typedef struct _DIRECTION {
+
+    char isNorth;
+    char isEast;
+    char onlyHorizontal;
+
+} Direction ;
 
 typedef struct _FISH {
 
-    float pos_x;
-    float pos_y;
+    int pos_x;
+    int pos_y;
 
-    int dest_pos_x;
-    int dest_pos_y;
+    Direction direction;
 
-    int speed;
-
-    float vel_x;
-    float vel_y;
+    unsigned int counter;
 
     enum Color color;
 
@@ -112,17 +116,16 @@ enum Command parse_command(char* parse_string, size_t parse_string_size);
 
 void itocstr(int integer, char* string, size_t str_size);
 
-int rand_from_range(int min, int max);
-
 Fish create_fish();
 
 Fish empty_fish();
 
 void simulate(Fish* fishes, size_t fish_count);
 
-Fish sim_oob(Fish fish);
+Fish simulate_OutOfBoundsHandle(Fish fish);
+
+Direction simulate_NextDirection(Direction direction);
 
 void render(Fish* fishes, size_t fish_count);
-
 
 #endif
