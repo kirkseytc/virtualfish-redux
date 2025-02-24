@@ -1,7 +1,7 @@
 #ifndef FISH_GRPAHIC_H
 #define FISH_GRPAHIC_H
 
-const char FISH_GRAPHIC[6][40] = {
+const char TITLE_FISH_GRAPHIC[6][40] = {
     "            /`-._        ",
     "          _/,.._/        ",
     "       ,-'   ,  `-:,.-') ",    
@@ -9,6 +9,10 @@ const char FISH_GRAPHIC[6][40] = {
     "       `-.  `' _,.-\\`-.)",
     "          `\\\\``\\,.-'  "
 };
+
+const char FISH_G_FL[] = "<><";
+const unsigned char FISH_G_FF[] = "¸|¸";
+const char FISH_G_FR[] = "><>";
 
 
 /*

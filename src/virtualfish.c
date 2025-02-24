@@ -16,14 +16,14 @@
 #define SPACE_KEY 32
 
 // Gloabl Variables
-static unsigned int seed = 0;
-static unsigned int count = 0;
-static unsigned int max = 0;
-static unsigned char black_and_white = 0;
-static unsigned char no_title_scr = 0;
+static unsigned int seed;
+static unsigned int start_count;
+static unsigned int max;
+static unsigned char black_and_white;
+static unsigned char no_title_scr;
 
-static unsigned int tank_min_bounds[2] = {0,0};
-static unsigned int tank_max_bounds[2] = {0,0};
+static unsigned int tank_min_bounds[2];
+static unsigned int tank_max_bounds[2];
 
 int main(int argc, char** argv){
 
@@ -63,6 +63,14 @@ int main(int argc, char** argv){
 
     endwin();
 
+    switch(update_code){
+        case 1:
+            printf("Failed to allocate fish array in 'update()'.\n");
+            break;
+        default:
+            printf("Goodbye!\n");
+    }
+
     return 0;
 }
 
@@ -71,7 +79,7 @@ void set_flag_defaults(){
     black_and_white = 0;
     no_title_scr = 0;
     max = 10;
-    count = 0;
+    start_count = 0;
     seed = time(NULL);
 
 }
@@ -105,7 +113,11 @@ void handle_flags(int argc, char** argv){
             int tmp_count = 0;
             
             if((tmp_count = atoi(argv[i + 1])) >= 0){
-                count = tmp_count;
+                if(tmp_count > max){
+                    start_count = max;
+                } else {
+                    start_count = tmp_count;
+                }
             }
 
             continue;
@@ -161,12 +173,12 @@ void title_screen(){
 
     if (black_and_white == 0) wattron(title_win, COLOR_PAIR(COLOR_CYAN));
     
-    mvwaddnstr(title_win, 1, 1, FISH_GRAPHIC[0], 30);
-    mvwaddnstr(title_win, 2, 1, FISH_GRAPHIC[1], 30);
-    mvwaddnstr(title_win, 3, 1, FISH_GRAPHIC[2], 30);
-    mvwaddnstr(title_win, 4, 1, FISH_GRAPHIC[3], 30);
-    mvwaddnstr(title_win, 5, 1, FISH_GRAPHIC[4], 30);
-    mvwaddnstr(title_win, 6, 1, FISH_GRAPHIC[5], 30);
+    mvwaddnstr(title_win, 1, 1, TITLE_FISH_GRAPHIC[0], 30);
+    mvwaddnstr(title_win, 2, 1, TITLE_FISH_GRAPHIC[1], 30);
+    mvwaddnstr(title_win, 3, 1, TITLE_FISH_GRAPHIC[2], 30);
+    mvwaddnstr(title_win, 4, 1, TITLE_FISH_GRAPHIC[3], 30);
+    mvwaddnstr(title_win, 5, 1, TITLE_FISH_GRAPHIC[4], 30);
+    mvwaddnstr(title_win, 6, 1, TITLE_FISH_GRAPHIC[5], 30);
     
     if(black_and_white == 0) wattroff(title_win, COLOR_PAIR(COLOR_CYAN)); 
     
@@ -183,6 +195,20 @@ void title_screen(){
 }
 
 int update(){
+
+    static Fish* fishes = NULL;
+    static unsigned int internal_count = 0;
+
+    // allocate on first run
+    if(fishes == NULL){
+        if((fishes = malloc(sizeof(Fish) * max)) == NULL) return 1;
+
+        if(internal_count != start_count){
+            for(; internal_count < start_count; internal_count++){
+                fishes[internal_count] = create_fish();
+            }
+        }
+    }
 
     // read input
 
@@ -205,19 +231,44 @@ int update(){
         switch(parse_command(input_str, input_str_size)){
 
             case FISH:
-                // todo: spawn fish
+                
+                if(internal_count == max){
+                    waddnstr(input_win, "Maximum amount of fish already exist.", 38);
+                    wrefresh(input_win);
+                    napms(750);
+                    break;
+                }
+
+                fishes[internal_count] = create_fish();
+                internal_count++;
+
                 waddnstr(input_win, "New Fish Spawned", 17);
                 wrefresh(input_win);
                 napms(750);
                 break;
             case MAX:
-                // todo: spawn max fish
+                
+                if(internal_count == max){
+                    waddnstr(input_win, "Maximum amount of fish already exist.", 38);
+                    wrefresh(input_win);
+                    napms(750);
+                    break;
+                }
+
+                for(;internal_count < max; internal_count++){
+                    fishes[internal_count] = create_fish();
+                }
+
                 waddnstr(input_win, "Max Fish Spawned", 17);
                 wrefresh(input_win);
                 napms(750);
                 break;
             case CLEAR:
-                // todo: clear fish
+                
+                for(int i; i < max; i++){
+                    fishes[i] = empty_fish();
+                }
+
                 waddnstr(input_win, "Fish Cleared", 13);
                 wrefresh(input_win);
                 napms(750);
@@ -483,3 +534,22 @@ int rand_from_range(int min, int max){
     return rand() % mod + min;
 
 }
+
+Fish create_fish(){
+
+    static Fish new_fish;
+
+    new_fish.color = (enum Color)(rand() % (enum Color)SIZE);
+    new_fish.pos_x = rand_from_range(tank_min_bounds[TANK_BOUND_X], tank_max_bounds[TANK_BOUND_X]);
+    new_fish.pos_y = rand_from_range(tank_min_bounds[TANK_BOUND_Y], tank_max_bounds[TANK_BOUND_Y]);
+
+    return new_fish;
+
+}
+
+Fish empty_fish(){
+    static Fish empty = {0, 0, 0};
+    return empty;
+}
+
+void render(Fish* fishes);

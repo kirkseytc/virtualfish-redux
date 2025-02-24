@@ -1,6 +1,8 @@
 #ifndef VIRTUALFISH_H
 #define VIRTUALFISH_H
 
+
+
 enum Command {
     FISH,
     MAX,
@@ -9,6 +11,28 @@ enum Command {
     QUIT,
     _BLANK
 };
+
+enum Color {
+    DEFAULT,
+    RED,
+    GREEN,
+    YELLOW,
+    BLUE,
+    MAGENTA,
+    CYAN,
+    WHITE,
+    SIZE
+};
+
+typedef struct _FISH {
+
+    int pos_x;
+    int pos_y;
+    enum Color color;
+
+
+
+} Fish ;
 
 /**
  * initializes global var Flag_Vals
@@ -82,5 +106,11 @@ enum Command parse_command(char* parse_string, size_t parse_string_size);
 void itocstr(int integer, char* string, size_t str_size);
 
 int rand_from_range(int min, int max);
+
+Fish create_fish();
+
+Fish empty_fish();
+
+void render(Fish* fishes);
 
 #endif
