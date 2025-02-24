@@ -26,11 +26,18 @@ enum Color {
 
 typedef struct _FISH {
 
-    int pos_x;
-    int pos_y;
+    float pos_x;
+    float pos_y;
+
+    int dest_pos_x;
+    int dest_pos_y;
+
+    int speed;
+
+    float vel_x;
+    float vel_y;
+
     enum Color color;
-
-
 
 } Fish ;
 
@@ -111,6 +118,11 @@ Fish create_fish();
 
 Fish empty_fish();
 
+void simulate(Fish* fishes, size_t fish_count);
+
+Fish sim_oob(Fish fish);
+
 void render(Fish* fishes, size_t fish_count);
+
 
 #endif

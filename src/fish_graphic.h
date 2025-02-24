@@ -10,6 +10,8 @@ const char TITLE_FISH_GRAPHIC[6][40] = {
     "          `\\\\``\\,.-'  "
 };
 
+const unsigned int FISH_G_SIZE = 4;
+
 const char FISH_G_FL[] = "<><";
 const unsigned char FISH_G_FF[] = "¸|¸";
 const char FISH_G_FR[] = "><>";

@@ -299,6 +299,12 @@ int update(){
 
     }
 
+    // simulation logic
+
+    simulate(fishes, internal_count);
+
+    // render fish
+
     render(fishes, internal_count);
 
     return 0;
@@ -428,7 +434,7 @@ void set_tank_values(){
     tank_min_bounds[TANK_X] = 1;
     tank_min_bounds[TANK_Y] = 2;
 
-    tank_max_bounds[TANK_X] = getmaxx(stdscr) - 2;
+    tank_max_bounds[TANK_X] = getmaxx(stdscr) - 2 - FISH_G_SIZE;
     tank_max_bounds[TANK_Y] = getmaxy(stdscr) - 3;
 
     tank_size[TANK_X] = tank_max_bounds[TANK_X] - tank_min_bounds[TANK_X] + 1;
@@ -546,19 +552,86 @@ int rand_from_range(int min, int max){
 
 Fish create_fish(){
 
-    static Fish new_fish;
+    static Fish this;
 
-    new_fish.color = (enum Color)(rand() % (enum Color)SIZE);
-    new_fish.pos_x = rand_from_range(tank_min_bounds[TANK_X], tank_max_bounds[TANK_X]);
-    new_fish.pos_y = rand_from_range(tank_min_bounds[TANK_Y], tank_max_bounds[TANK_Y]);
+    this.pos_x = rand_from_range(tank_min_bounds[TANK_X], tank_max_bounds[TANK_X]);
+    this.pos_y = rand_from_range(tank_min_bounds[TANK_Y], tank_max_bounds[TANK_Y]);
 
-    return new_fish;
+    this.dest_pos_x = rand_from_range(tank_min_bounds[TANK_X], tank_max_bounds[TANK_X]);
+    this.dest_pos_y = rand_from_range(tank_min_bounds[TANK_Y], tank_max_bounds[TANK_Y]);
+
+    this.speed = 60;
+
+    this.vel_x = (float)((this.dest_pos_x - this.pos_x) / this.speed);
+    this.vel_y = (float)((this.dest_pos_y - this.pos_y) / this.speed);
+
+    this.color = (enum Color)(rand() % (enum Color)SIZE);
+
+    return this;
 
 }
 
 Fish empty_fish(){
-    static Fish empty = {0, 0, 0};
+    static Fish empty = {};
     return empty;
+}
+
+void simulate(Fish* fishes, size_t fish_count){
+
+    for(size_t i = 0; i < fish_count; i++){
+
+        Fish fish = fishes[i];
+
+        fish = sim_oob(fish);
+
+        if((fish.dest_pos_x == (int)fish.pos_x) && (fish.dest_pos_y == (int)fish.pos_y)){
+
+            fish.pos_x = fish.dest_pos_x;
+            fish.pos_y = fish.dest_pos_y;
+
+            fish.dest_pos_x = create_fish().dest_pos_x;
+            fish.dest_pos_y = create_fish().dest_pos_y;
+
+            fish.vel_x = (float)((fish.dest_pos_x - fish.pos_x) / fish.speed);
+            fish.vel_y = (float)((fish.dest_pos_y - fish.pos_y) / fish.speed);
+
+        } else {
+
+            fish.pos_x += fish.vel_x;
+            fish.pos_y += fish.vel_y;
+        
+        }
+
+        fishes[i] = fish;
+
+    }
+
+}
+
+Fish sim_oob(Fish fish){
+
+    if((unsigned int)fish.pos_x > tank_max_bounds[TANK_X]){
+        fish.pos_x = tank_max_bounds[TANK_X];
+        fish.dest_pos_x = (int)fish.pos_x;
+    }
+
+    if((unsigned int)fish.pos_x < tank_min_bounds[TANK_X]){
+        fish.pos_x = tank_min_bounds[TANK_X];
+        fish.dest_pos_x = (int)fish.pos_x;
+    }
+
+    if((unsigned int)fish.pos_y > tank_max_bounds[TANK_Y]){
+        fish.pos_y = tank_max_bounds[TANK_Y];
+        fish.dest_pos_y = (int)fish.pos_y;
+    }
+
+    if((unsigned int)fish.pos_y < tank_min_bounds[TANK_Y]){
+        fish.pos_y = tank_min_bounds[TANK_Y];
+        fish.dest_pos_y = (int)fish.pos_y;
+    }
+
+    return fish;
+
 }
 
 void render(Fish* fishes, size_t fish_count){
@@ -569,7 +642,11 @@ void render(Fish* fishes, size_t fish_count){
     // '&& i < max' might be optional, but just in case for now
     for(unsigned int i = 0; i < fish_count && i < max; i++){
 
-        mvwaddnstr(tank, fishes[i].pos_y, fishes[i].pos_x, FISH_G_FR, 4);
+        if(black_and_white == 0) wattron(tank, COLOR_PAIR(fishes[i].color));
+
+        mvwaddnstr(tank, fishes[i].pos_y, fishes[i].pos_x, FISH_G_FR, FISH_G_SIZE);
+
+        if(black_and_white == 0) wattroff(tank, COLOR_PAIR(fishes[i].color));
 
     }
 
