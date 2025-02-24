@@ -84,7 +84,7 @@ void draw_sand(char*);
 /**
  * 
  */
-void set_tank_bounds();
+void set_tank_values();
 
 /**
  * Initilizes the 8 basic color pairs for color use
@@ -111,6 +111,6 @@ Fish create_fish();
 
 Fish empty_fish();
 
-void render(Fish* fishes);
+void render(Fish* fishes, size_t fish_count);
 
 #endif

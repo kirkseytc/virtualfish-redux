@@ -11,8 +11,8 @@
 #include "fish_graphic.h"
 
 // Local Macros
-#define TANK_BOUND_X 0
-#define TANK_BOUND_Y 1
+#define TANK_X 0
+#define TANK_Y 1
 #define SPACE_KEY 32
 
 // Gloabl Variables
@@ -24,6 +24,7 @@ static unsigned char no_title_scr;
 
 static unsigned int tank_min_bounds[2];
 static unsigned int tank_max_bounds[2];
+static size_t tank_size[2];
 
 int main(int argc, char** argv){
 
@@ -113,7 +114,7 @@ void handle_flags(int argc, char** argv){
             int tmp_count = 0;
             
             if((tmp_count = atoi(argv[i + 1])) >= 0){
-                if(tmp_count > max){
+                if((unsigned int)tmp_count > max){
                     start_count = max;
                 } else {
                     start_count = tmp_count;
@@ -158,7 +159,7 @@ void init_env(){
     draw_box();
     draw_water();
     draw_sand(gen_sand());
-    set_tank_bounds();
+    set_tank_values();
     refresh();
 
 }
@@ -218,10 +219,11 @@ int update(){
 
     if(input == ':' || input == ';'){
 
-        int input_str_size = 128;
+        int input_str_size = 64;
         char input_str[input_str_size];
 
-        WINDOW* input_win = newwin(1, getmaxx(stdscr) - 2, getmaxy(stdscr) - 2, 1);
+        WINDOW* input_win = subwin(stdscr, 1, getmaxx(stdscr) - 2, getmaxy(stdscr) - 2, 1);
+        wclear(input_win);
         waddch(input_win, ':');
 
         game_mode_off();
@@ -265,15 +267,18 @@ int update(){
                 break;
             case CLEAR:
                 
-                for(int i; i < max; i++){
+                for(unsigned int i; i < max; i++){
                     fishes[i] = empty_fish();
                 }
+
+                internal_count = 0;
 
                 waddnstr(input_win, "Fish Cleared", 13);
                 wrefresh(input_win);
                 napms(750);
                 break;
             case SEED:
+
                 char parsed_seed[12] = {0};
                 itocstr((signed int)seed, parsed_seed, 12);
                 waddnstr(input_win, parsed_seed, 12);
@@ -281,9 +286,12 @@ int update(){
                 while(!(wgetch(input_win) == SPACE_KEY));
                 break;
             case QUIT:
-                return 1;
+
+                return INT32_MAX;
             case _BLANK:
+
                 break;
+
         }
 
         delwin(input_win);
@@ -291,9 +299,7 @@ int update(){
 
     }
 
-    // render updates
-
-    refresh();
+    render(fishes, internal_count);
 
     return 0;
 
@@ -417,13 +423,16 @@ void draw_sand(char* sand_pat){
 
 }
 
-void set_tank_bounds(){
+void set_tank_values(){
 
-    tank_min_bounds[TANK_BOUND_X] = 1;
-    tank_min_bounds[TANK_BOUND_Y] = 2;
+    tank_min_bounds[TANK_X] = 1;
+    tank_min_bounds[TANK_Y] = 2;
 
-    tank_max_bounds[TANK_BOUND_X] = getmaxx(stdscr) - 2;
-    tank_max_bounds[TANK_BOUND_Y] = getmaxy(stdscr) - 3;
+    tank_max_bounds[TANK_X] = getmaxx(stdscr) - 2;
+    tank_max_bounds[TANK_Y] = getmaxy(stdscr) - 3;
+
+    tank_size[TANK_X] = tank_max_bounds[TANK_X] - tank_min_bounds[TANK_X] + 1;
+    tank_size[TANK_Y] = tank_max_bounds[TANK_Y] - tank_min_bounds[TANK_Y] + 1;
 
 }
 
@@ -540,8 +549,8 @@ Fish create_fish(){
     static Fish new_fish;
 
     new_fish.color = (enum Color)(rand() % (enum Color)SIZE);
-    new_fish.pos_x = rand_from_range(tank_min_bounds[TANK_BOUND_X], tank_max_bounds[TANK_BOUND_X]);
-    new_fish.pos_y = rand_from_range(tank_min_bounds[TANK_BOUND_Y], tank_max_bounds[TANK_BOUND_Y]);
+    new_fish.pos_x = rand_from_range(tank_min_bounds[TANK_X], tank_max_bounds[TANK_X]);
+    new_fish.pos_y = rand_from_range(tank_min_bounds[TANK_Y], tank_max_bounds[TANK_Y]);
 
     return new_fish;
 
@@ -552,4 +561,20 @@ Fish empty_fish(){
     return empty;
 }
 
-void render(Fish* fishes);
+void render(Fish* fishes, size_t fish_count){
+
+    WINDOW* tank = subwin(stdscr, tank_size[TANK_Y], tank_size[TANK_X], tank_min_bounds[TANK_Y], tank_min_bounds[TANK_X]);
+    wclear(tank);
+
+    // '&& i < max' might be optional, but just in case for now
+    for(unsigned int i = 0; i < fish_count && i < max; i++){
+
+        mvwaddnstr(tank, fishes[i].pos_y, fishes[i].pos_x, FISH_G_FR, 4);
+
+    }
+
+    refresh();
+
+    delwin(tank);
+    
+}
