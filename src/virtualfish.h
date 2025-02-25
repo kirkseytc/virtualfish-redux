@@ -95,7 +95,7 @@ void draw_sand(char*);
 /**
  * 
  */
-void set_tank_values();
+void set_tank_win_values();
 
 /**
  * Initilizes the 8 basic color pairs for color use
@@ -127,5 +127,7 @@ Fish simulate_OutOfBoundsHandle(Fish fish);
 Direction simulate_NextDirection(Direction direction);
 
 void render(Fish* fishes, size_t fish_count);
+
+int integer_clamp(int* num, int min, int max);
 
 #endif

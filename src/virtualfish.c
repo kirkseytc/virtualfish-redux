@@ -11,9 +11,10 @@
 #include "fish_graphic.h"
 
 // Local Macros
-#define TANK_X 0
-#define TANK_Y 1
+#define X 0
+#define Y 1
 #define SPACE_KEY 32
+#define FISH_GRAPHIC_SIZE 4
 
 // Gloabl Variables
 static unsigned int seed;
@@ -22,9 +23,9 @@ static unsigned int max;
 static unsigned char black_and_white;
 static unsigned char no_title_scr;
 
-static unsigned int tank_min_bounds[2];
-static unsigned int tank_max_bounds[2];
-static size_t tank_size[2];
+static unsigned int tank_win_size[2];
+static unsigned int tank_win_start[2];
+static unsigned int tank_win_end[2];
 
 int main(int argc, char** argv){
 
@@ -56,7 +57,7 @@ int main(int argc, char** argv){
     game_mode_on();
 
     init_env();
-
+    
     if(no_title_scr == 0) title_screen();
 
     int update_code = 0;
@@ -159,7 +160,7 @@ void init_env(){
     draw_box();
     draw_water();
     draw_sand(gen_sand());
-    set_tank_values();
+    set_tank_win_values();
     refresh();
 
 }
@@ -173,7 +174,7 @@ void title_screen(){
     mvwaddnstr(title_win, 0, 8, TITLE, 18);
 
     if (black_and_white == 0) wattron(title_win, COLOR_PAIR(COLOR_CYAN));
-    
+
     mvwaddnstr(title_win, 1, 1, TITLE_FISH_GRAPHIC[0], 30);
     mvwaddnstr(title_win, 2, 1, TITLE_FISH_GRAPHIC[1], 30);
     mvwaddnstr(title_win, 3, 1, TITLE_FISH_GRAPHIC[2], 30);
@@ -244,7 +245,7 @@ int update(){
                 fishes[internal_count] = create_fish();
                 internal_count++;
 
-                waddnstr(input_win, "New Fish Spawned", 17);
+                waddnstr(input_win, "Spawning Fish.", 15);
                 wrefresh(input_win);
                 napms(750);
                 break;
@@ -261,7 +262,7 @@ int update(){
                     fishes[internal_count] = create_fish();
                 }
 
-                waddnstr(input_win, "Max Fish Spawned", 17);
+                waddnstr(input_win, "Spawning maximum fish", 22);
                 wrefresh(input_win);
                 napms(750);
                 break;
@@ -273,7 +274,7 @@ int update(){
 
                 internal_count = 0;
 
-                waddnstr(input_win, "Fish Cleared", 13);
+                waddnstr(input_win, "Clearing fish.", 15);
                 wrefresh(input_win);
                 napms(750);
                 break;
@@ -429,16 +430,17 @@ void draw_sand(char* sand_pat){
 
 }
 
-void set_tank_values(){
+void set_tank_win_values(){
 
-    tank_min_bounds[TANK_X] = 1;
-    tank_min_bounds[TANK_Y] = 2;
+    tank_win_start[X] = 1;
+    tank_win_start[Y] = 2;
 
-    tank_max_bounds[TANK_X] = getmaxx(stdscr) - 2;
-    tank_max_bounds[TANK_Y] = getmaxy(stdscr) - 3;
+    tank_win_end[X] = (getmaxx(stdscr) - 1) - 1;
+    tank_win_end[Y] = (getmaxy(stdscr) - 1) - 2;
 
-    tank_size[TANK_X] = tank_max_bounds[TANK_X] - tank_min_bounds[TANK_X] + 1;
-    tank_size[TANK_Y] = tank_max_bounds[TANK_Y] - tank_min_bounds[TANK_Y] + 1;
+    tank_win_size[X] = tank_win_end[X] - tank_win_start[X] + 1;
+    tank_win_size[Y] = tank_win_end[Y] - tank_win_start[Y] + 1;
+
 
 }
 
@@ -542,8 +544,8 @@ Fish create_fish(){
 
     static Fish this;
 
-    this.pos_x = ((tank_size[TANK_X] - FISH_G_SIZE) / 2) + tank_min_bounds[TANK_X];
-    this.pos_y = (tank_size[TANK_Y] / 2) + tank_min_bounds[TANK_Y];
+    this.pos_x = ((tank_win_size[X] - FISH_GRAPHIC_SIZE) / 2) + tank_win_start[X];
+    this.pos_y = (tank_win_size[Y] / 2) + tank_win_start[Y];
 
     this.direction.isNorth = rand() % 2;
     this.direction.isEast = rand() % 2;
@@ -604,25 +606,8 @@ void simulate(Fish* fishes, size_t fish_count){
 
 Fish simulate_OutOfBoundsHandle(Fish fish){
 
-    if(fish.pos_x > (int)(tank_max_bounds[TANK_X] - FISH_G_SIZE)){
-        fish.pos_x = tank_max_bounds[TANK_X] - FISH_G_SIZE;
-        fish.counter = 0;
-    }
-
-    if(fish.pos_y > (int)tank_max_bounds[TANK_Y]){
-        fish.pos_y = tank_max_bounds[TANK_Y];
-        fish.counter = 0;
-    }
-
-    if(fish.pos_x < (int)tank_min_bounds[TANK_X]){
-        fish.pos_x = tank_min_bounds[TANK_X];
-        fish.counter = 0;
-    }
-
-    if(fish.pos_y < (int)tank_min_bounds[TANK_Y]){
-        fish.pos_y = tank_min_bounds[TANK_Y];
-        fish.counter = 0;
-    }
+    if(integer_clamp(&fish.pos_x, tank_win_start[X], tank_win_end[X])) fish.counter = 0;
+    if(integer_clamp(&fish.pos_y, tank_win_start[Y], tank_win_end[Y])) fish.counter = 0;
 
     return fish;
 
@@ -640,17 +625,22 @@ Direction simulate_NextDirection(Direction direction){
 
 void render(Fish* fishes, size_t fish_count){
 
-    WINDOW* tank = subwin(stdscr, tank_size[TANK_Y], tank_size[TANK_X], tank_min_bounds[TANK_Y], tank_min_bounds[TANK_X]);
+    WINDOW* tank = subwin(stdscr, tank_win_size[Y], tank_win_size[X], tank_win_start[Y], tank_win_start[X]);
     wclear(tank);
 
     // '&& i < max' might be optional, but just in case for now
     for(unsigned int i = 0; i < fish_count && i < max; i++){
 
-        if(black_and_white == 0) wattron(tank, COLOR_PAIR(fishes[i].color));
+        Fish fish = fishes[i];
 
-        mvwaddnstr(tank, fishes[i].pos_y, fishes[i].pos_x, FISH_G_FR, FISH_G_SIZE);
+        if(black_and_white == 0) wattron(tank, COLOR_PAIR(fish.color));
+
+        char graphic[FISH_GRAPHIC_SIZE] = "<><";
+        if(fish.direction.isEast) strcpy(graphic, "><>");
+
+        mvwaddnstr(tank, fish.pos_y, fish.pos_x, graphic, FISH_GRAPHIC_SIZE);
         
-        if(black_and_white == 0) wattroff(tank, COLOR_PAIR(fishes[i].color));
+        if(black_and_white == 0) wattroff(tank, COLOR_PAIR(fish.color));
 
     }
 
@@ -658,4 +648,19 @@ void render(Fish* fishes, size_t fish_count){
 
     delwin(tank);
     
+}
+
+int integer_clamp(int* num, int min, int max){
+
+    if(*num > max){
+        return 1;
+        *num = max;
+    }
+
+    if(*num < min){
+        return -1;
+        *num = max;
+    }
+
+    return 0;
 }
