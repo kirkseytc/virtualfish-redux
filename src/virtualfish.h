@@ -4,6 +4,18 @@
 #define COMMAND_TOTAL 6
 #define COLOR_TOTAL 8
 
+/*
+    Ascii Fish by Max Strandberg from www.asciiart.eu
+*/
+const char TITLE_FISH_GRAPHIC[6][40] = {
+    "            /`-._        ",
+    "          _/,.._/        ",
+    "       ,-'   ,  `-:,.-') ",    
+    "      : o ):';     _  {  ",
+    "       `-.  `' _,.-\\`-.)",
+    "          `\\\\``\\,.-'  "
+};
+
 enum Command {
     FISH,
     MAX,
@@ -45,89 +57,115 @@ typedef struct _FISH {
 
 } Fish ;
 
-/**
- * initializes global var Flag_Vals
- */
-void set_flag_defaults();
+int main(int argc, char** argv);
 
-/**
- * Handles argc & argv flags
- */
-void handle_flags(int, char**);
+    /**
+     * initializes global var Flag_Vals
+     */
+    void set_flag_defaults();
 
-/**
- * Initlizes tank grpahics
- */
-void init_env();
+    /**
+     * Handles argc & argv flags
+     */
+    void handle_flags(int, char**);
 
-/**
- * Runs title screen logic
- */
-void title_screen();
+    /**
+     * Initilizes the 8 basic color pairs for color use
+     */
+    void init_color_pairs();
 
-/**
- * Runs the game loop and return 0 upon success
- */
-int update();
+    /**
+     * Turns on terminal modifers for the game mode
+     */
+    void game_mode_on();
 
-/**
- * Draws a bolded box to stdscr
- */
-void draw_box();
+    /**
+     * Turns off terminal modifers for the game mode
+     */
+    void game_mode_off();
 
-/**
- * Draws the water pattern for the tank
- */
-void draw_water();
+    /**
+     * Initlizes tank grpahics
+     */
+    void init_env();
 
-/**
- * Generates the sand pattern in an heap alloctaed c string and returns the pointer.
- */
-char* gen_sand();
+        /**
+         * Draws a bolded box to stdscr
+         */
+        void draw_box();
 
-/**
- * Draws the sand pattern stored in the c string passed in and uses it statically, unless a new string is passed in.
- * 
- * NOTE: Whatever c string that is stored in the static varibale will have free() called upon it when a new one is passed.
- */
-void draw_sand(char*);
+        /**
+         * Draws the water pattern for the tank
+         */
+        void draw_water();
 
-/**
- * 
- */
-void set_tank_win_values();
+        /**
+         * Generates the sand pattern in an heap alloctaed c string and returns the pointer.
+         */
+        char* gen_sand();
 
-/**
- * Initilizes the 8 basic color pairs for color use
- */
-void init_color_pairs();
+        /**
+         * Draws the sand pattern stored in the c string passed in and uses it statically, unless a new string is passed in.
+         * 
+         * NOTE: Whatever c string that is stored in the static varibale will have free() called upon it when a new one is passed.
+         */
+        void draw_sand(char*);
 
-/**
- * Turns on terminal modifers for the game mode
- */
-void game_mode_on();
+        /**
+         * 
+         */
+        void set_tank_win_values();
 
-/**
- * Turns off terminal modifers for the game mode
- */
-void game_mode_off();
+    /**
+     * Runs title screen logic
+     */
+    void title_screen();
 
-enum Command parse_command(char* parse_string, size_t parse_string_size);
+    /**
+     * Runs the game loop and return 0 upon success
+     */
+    int update();
 
-void itocstr(int integer, char* string, size_t str_size);
+        /**
+         * Returns an initialized fish with randomized fields
+         */
+        Fish create_fish();
 
-Fish create_fish();
+        /**
+         * Takes a string and parses an enum Command from it
+         */
+        enum Command parse_command(char* parse_string, size_t parse_string_size);
 
-Fish empty_fish();
 
-void simulate(Fish* fishes, size_t fish_count);
+        /**
+         * Returns an initalized fish with empty fields
+         */
+        Fish empty_fish();
 
-void simulate_OutOfBoundsHandle(Fish* fish);
+        /**
+         * Converts an integer into a string and stores in the string passed
+         */
+        void itocstr(int integer, char* string, size_t str_size);
 
-Direction simulate_NextDirection(Direction direction);
+        /**
+         * Runs simulation logic in the update loop
+         */
+        void simulate(Fish* fishes, size_t fish_count);
 
-void render(Fish* fishes, size_t fish_count);
+            /**
+             * Handles Out of bounds conditions for simulation logic
+             */
+            void simulate_OutOfBoundsHandle(Fish* fish);
 
-int integer_clamp(int* num, int min, int max);
+                /**
+                 * Clamps the given the number between min and max (inclusive)
+                 */
+                int integer_clamp(int* num, int min, int max);
+
+
+        /**
+         * Handles the render logic of the update loop
+         */
+        void render(Fish* fishes, size_t fish_count);
 
 #endif

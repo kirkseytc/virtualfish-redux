@@ -8,7 +8,6 @@
 
 // Local Headers
 #include "virtualfish.h"
-#include "fish_graphic.h"
 
 // Local Macros
 #define X 0
@@ -123,6 +122,36 @@ void handle_flags(int argc, char** argv){
 
 }
 
+void init_color_pairs(){
+
+    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
+    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
+    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
+    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+
+}
+
+void game_mode_on(){
+
+    cbreak(); 
+    noecho(); 
+    timeout(100); 
+    curs_set(0);
+
+}
+
+void game_mode_off(){
+
+    nocbreak(); 
+    echo(); 
+    timeout(-1); 
+    curs_set(1);
+
+}
+
 void init_env(){ 
 
     draw_box();
@@ -130,6 +159,148 @@ void init_env(){
     draw_sand(gen_sand());
     set_tank_win_values();
     refresh();
+
+}
+
+void draw_box(){
+
+    attron(A_BOLD);
+    box(stdscr, 0, 0);
+    attroff(A_BOLD);
+
+}
+
+void draw_water(){ 
+
+    const char WATER_CHR[] = {'-', '.', '_'};
+    const int WATER_OFFSET = 2;
+    const int WATER_START = 1;
+    const int WATER_Y = 1;
+
+    const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
+
+    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD);
+
+    for(int counter = 0; counter < SIZE; counter++){
+
+        int x = WATER_START + counter; // gets cursor x pos
+        char ch = 0;
+
+        switch(counter % 8){ // selects the character in the water pattern to draw
+            case 0:
+            case 1:
+                ch = WATER_CHR[0];
+                break;
+            case 2:
+            case 3:
+            case 6:
+            case 7:
+                ch = WATER_CHR[1];
+                break;
+            case 4:
+            case 5:
+                ch = WATER_CHR[2];
+                break;
+        }
+
+        mvaddch(WATER_Y, x, ch); // puts character to screen
+
+    }
+
+    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD);
+
+}
+
+char* gen_sand(){
+
+    char sand_chr[] = {'-', '.', '_'};
+    int sand_offset_x = 2;
+    
+    unsigned int size = getmaxx(stdscr) - sand_offset_x;
+    
+    unsigned int sand_pattern_size = size + 1; // plus 1 for the null terminator
+
+    char* sand_pattern = malloc(sizeof(char) * sand_pattern_size);
+
+    int ch_index = 1;
+
+    for(unsigned int i = 0; i < size; i++){
+
+        /*
+            0 = stay same
+            1 = go up
+            2 = go down
+        */
+
+        int rnd = rand() % 3;
+
+        switch(rnd){
+            case 1:
+
+                if(ch_index > 0){
+                    ch_index--;
+                }
+
+                break;
+            case 2:
+
+                if(ch_index < 2){
+                    ch_index++;
+                }
+
+                break;
+        }
+
+        sand_pattern[i] = sand_chr[ch_index];
+        
+    }
+
+    sand_pattern[sand_pattern_size - 1] = '\0';
+
+    return sand_pattern;
+
+}
+
+void draw_sand(char* sand_pat){
+
+    static char* sand_pattern = NULL;
+
+    if(sand_pat != NULL){
+        free(sand_pattern);
+        sand_pattern = sand_pat;
+    }
+
+    int sand_offset = 2;
+
+    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    
+    mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
+    
+    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+
+}
+
+void set_tank_win_values(){
+
+    /**
+     * 1 => 1 from box
+    */ 
+    tank_win_start[X] = 1;
+
+    /**
+     * 2 => 1 from box + 1 from water
+     */
+    tank_win_start[Y] = 2;
+
+    /**
+     * 3 => 1 from box + 2 for graphics
+     */
+    fish_max_pos[X] = (getmaxx(stdscr) - 1) - 3 - tank_win_start[X];
+
+    /**
+     * 2 => 1 from box + 1 from sand
+     */
+    fish_max_pos[Y] = (getmaxy(stdscr) - 1) - 2 - tank_win_start[Y];
 
 }
 
@@ -282,175 +453,22 @@ int update(){
 
 }
 
-void draw_box(){
+Fish create_fish(){
 
-    attron(A_BOLD);
-    box(stdscr, 0, 0);
-    attroff(A_BOLD);
+    Fish this;
 
-}
+    this.pos_x = (fish_max_pos[X] / 2) + ((rand() % 21) - 11);
+    this.pos_y = (fish_max_pos[Y] / 2) + ((rand() % 15) - 7);
 
-void draw_water(){ 
+    this.direction.isNorth = rand() % 2;
+    this.direction.isEast = rand() % 2;
+    this.direction.onlyHorizontal = rand() % 2;
 
-    const char WATER_CHR[] = {'-', '.', '_'};
-    const int WATER_OFFSET = 2;
-    const int WATER_START = 1;
-    const int WATER_Y = 1;
+    this.counter = (rand() % 10) + 15;
 
-    const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
+    this.color = (enum Color)(rand() % COLOR_TOTAL);
 
-    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD);
-
-    for(int counter = 0; counter < SIZE; counter++){
-
-        int x = WATER_START + counter; // gets cursor x pos
-        char ch = 0;
-
-        switch(counter % 8){ // selects the character in the water pattern to draw
-            case 0:
-            case 1:
-                ch = WATER_CHR[0];
-                break;
-            case 2:
-            case 3:
-            case 6:
-            case 7:
-                ch = WATER_CHR[1];
-                break;
-            case 4:
-            case 5:
-                ch = WATER_CHR[2];
-                break;
-        }
-
-        mvaddch(WATER_Y, x, ch); // puts character to screen
-
-    }
-
-    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD);
-
-}
-
-char* gen_sand(){
-
-    char sand_chr[] = {'-', '.', '_'};
-    int sand_offset_x = 2;
-    
-    unsigned int size = getmaxx(stdscr) - sand_offset_x;
-    
-    unsigned int sand_pattern_size = size + 1; // plus 1 for the null terminator
-
-    char* sand_pattern = malloc(sizeof(char) * sand_pattern_size);
-
-    int ch_index = 1;
-
-    for(unsigned int i = 0; i < size; i++){
-
-        /*
-            0 = stay same
-            1 = go up
-            2 = go down
-        */
-
-        int rnd = rand() % 3;
-
-        switch(rnd){
-            case 1:
-
-                if(ch_index > 0){
-                    ch_index--;
-                }
-
-                break;
-            case 2:
-
-                if(ch_index < 2){
-                    ch_index++;
-                }
-
-                break;
-        }
-
-        sand_pattern[i] = sand_chr[ch_index];
-        
-    }
-
-    sand_pattern[sand_pattern_size - 1] = '\0';
-
-    return sand_pattern;
-
-}
-
-void draw_sand(char* sand_pat){
-
-    static char* sand_pattern = NULL;
-
-    if(sand_pat != NULL){
-        free(sand_pattern);
-        sand_pattern = sand_pat;
-    }
-
-    int sand_offset = 2;
-
-    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-    
-    mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
-    
-    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
-
-}
-
-void set_tank_win_values(){
-
-    /**
-     * 1 => 1 from box
-    */ 
-    tank_win_start[X] = 1;
-
-    /**
-     * 2 => 1 from box + 1 from water
-     */
-    tank_win_start[Y] = 2;
-
-    /**
-     * 3 => 1 from box + 2 for graphics
-     */
-    fish_max_pos[X] = (getmaxx(stdscr) - 1) - 3 - tank_win_start[X];
-
-    /**
-     * 2 => 1 from box + 1 from sand
-     */
-    fish_max_pos[Y] = (getmaxy(stdscr) - 1) - 2 - tank_win_start[Y];
-
-}
-
-void init_color_pairs(){
-
-    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
-    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
-    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
-    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
-    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
-
-}
-
-void game_mode_on(){
-
-    cbreak(); 
-    noecho(); 
-    timeout(100); 
-    curs_set(0);
-
-}
-
-void game_mode_off(){
-
-    nocbreak(); 
-    echo(); 
-    timeout(-1); 
-    curs_set(1);
+    return this;
 
 }
 
@@ -476,6 +494,11 @@ enum Command parse_command(char* parse_string, size_t parse_string_size){
     }
 
     return _BLANK;
+}
+
+Fish empty_fish(){
+    static Fish empty = {};
+    return empty;
 }
 
 void itocstr(int integer, char* string, size_t str_size){
@@ -518,30 +541,6 @@ void itocstr(int integer, char* string, size_t str_size){
 
     }
 
-}
-
-Fish create_fish(){
-
-    Fish this;
-
-    this.pos_x = (fish_max_pos[X] / 2) + ((rand() % 21) - 11);
-    this.pos_y = (fish_max_pos[Y] / 2) + ((rand() % 15) - 7);
-
-    this.direction.isNorth = rand() % 2;
-    this.direction.isEast = rand() % 2;
-    this.direction.onlyHorizontal = rand() % 2;
-
-    this.counter = (rand() % 10) + 15;
-
-    this.color = (enum Color)(rand() % COLOR_TOTAL);
-
-    return this;
-
-}
-
-Fish empty_fish(){
-    static Fish empty = {};
-    return empty;
 }
 
 void simulate(Fish* fishes, size_t fish_count){
@@ -608,6 +607,21 @@ void simulate_OutOfBoundsHandle(Fish* fish){
 
 }
 
+int integer_clamp(int* num, int min, int max){
+
+    if(*num < min){
+        *num = min;
+        return -1;
+    }
+
+    if(*num > max){
+        *num = max;
+        return 1;
+    }
+
+    return 0;
+}
+
 void render(Fish* fishes, size_t fish_count){
 
     WINDOW* tank = derwin(stdscr, fish_max_pos[Y] + 1, (fish_max_pos[X] + 1) + 2, tank_win_start[Y], tank_win_start[X]);
@@ -633,19 +647,4 @@ void render(Fish* fishes, size_t fish_count){
 
     
     
-}
-
-int integer_clamp(int* num, int min, int max){
-
-    if(*num < min){
-        *num = min;
-        return -1;
-    }
-
-    if(*num > max){
-        *num = max;
-        return 1;
-    }
-
-    return 0;
 }
