@@ -47,6 +47,7 @@ _Note: Commands are not case sensitive._
 |`-sm`|Starts the game with the max amount of fish spawned in.|
 |`-bw`|Starts in Black and White mode|
 |`-nt`|Skips the title screen|
+|`-rf`|Makes the fish shift colors like rainbow rgb
 
 ## Releases
 

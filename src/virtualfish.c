@@ -21,6 +21,7 @@ static unsigned int start_count;
 static unsigned int max;
 static unsigned char black_and_white;
 static unsigned char no_title_scr;
+static unsigned char rainbow_fish;
 
 static unsigned int tank_win_start[2];
 static unsigned int fish_max_pos[2];
@@ -65,7 +66,7 @@ int main(int argc, char** argv){
 
     switch(update_code){
         case 1:
-            printf("Failed to allocate fish array in 'update()'.\n");
+            printf("Failed to allocate memory for fish array in 'update()'.\n");
             break;
         default:
             printf("Goodbye!\n");
@@ -76,10 +77,7 @@ int main(int argc, char** argv){
 
 void set_flag_defaults(){
 
-    black_and_white = 0;
-    no_title_scr = 0;
     max = 10;
-    start_count = 0;
     seed = time(NULL);
 
 }
@@ -118,19 +116,26 @@ void handle_flags(int argc, char** argv){
         
         }
 
+        if(strcmp(argv[i], "-rf") == 0){
+            
+            rainbow_fish = 1;
+            continue;
+        
+        }
+
     }
 
 }
 
 void init_color_pairs(){
 
-    init_pair(COLOR_RED, COLOR_RED, COLOR_BLACK);
-    init_pair(COLOR_GREEN, COLOR_GREEN, COLOR_BLACK);
-    init_pair(COLOR_YELLOW, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(COLOR_BLUE, COLOR_BLUE, COLOR_BLACK);
-    init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-    init_pair(COLOR_CYAN, COLOR_CYAN, COLOR_BLACK);
-    init_pair(COLOR_WHITE, COLOR_WHITE, COLOR_BLACK);
+    init_pair((enum Color)WHITE, COLOR_WHITE, COLOR_BLACK);
+    init_pair((enum Color)RED, COLOR_RED, COLOR_BLACK);
+    init_pair((enum Color)YELLOW, COLOR_YELLOW, COLOR_BLACK);
+    init_pair((enum Color)GREEN, COLOR_GREEN, COLOR_BLACK);
+    init_pair((enum Color)CYAN, COLOR_CYAN, COLOR_BLACK);
+    init_pair((enum Color)BLUE, COLOR_BLUE, COLOR_BLACK);
+    init_pair((enum Color)MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
 
 }
 
@@ -179,7 +184,7 @@ void draw_water(){
 
     const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
 
-    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_CYAN) | A_BOLD);
+    if(black_and_white == 0) attron(COLOR_PAIR(CYAN) | A_BOLD);
 
     for(int counter = 0; counter < SIZE; counter++){
 
@@ -207,7 +212,7 @@ void draw_water(){
 
     }
 
-    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_BLUE) | A_BOLD);
+    if(black_and_white == 0) attroff(COLOR_PAIR(CYAN) | A_BOLD);
 
 }
 
@@ -272,11 +277,11 @@ void draw_sand(char* sand_pat){
 
     int sand_offset = 2;
 
-    if(black_and_white == FALSE) attron(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    if(black_and_white == 0) attron(COLOR_PAIR(YELLOW) | A_BOLD);
     
     mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
     
-    if(black_and_white == FALSE) attroff(COLOR_PAIR(COLOR_YELLOW) | A_BOLD);
+    if(black_and_white == 0) attroff(COLOR_PAIR(YELLOW) | A_BOLD);
 
 }
 
@@ -310,23 +315,29 @@ void title_screen(){
     const char* MSG = "Press space to continue";
 
     WINDOW* title_win = newwin(8, 32, ((getmaxy(stdscr) / 2) - 4), ((getmaxx(stdscr) / 2) - 16));
-    mvwaddnstr(title_win, 0, 8, TITLE, 18);
-
-    if (black_and_white == 0) wattron(title_win, COLOR_PAIR(COLOR_CYAN));
-
-    mvwaddnstr(title_win, 1, 1, TITLE_FISH_GRAPHIC[0], 30);
-    mvwaddnstr(title_win, 2, 1, TITLE_FISH_GRAPHIC[1], 30);
-    mvwaddnstr(title_win, 3, 1, TITLE_FISH_GRAPHIC[2], 30);
-    mvwaddnstr(title_win, 4, 1, TITLE_FISH_GRAPHIC[3], 30);
-    mvwaddnstr(title_win, 5, 1, TITLE_FISH_GRAPHIC[4], 30);
-    mvwaddnstr(title_win, 6, 1, TITLE_FISH_GRAPHIC[5], 30);
-    
-    if(black_and_white == 0) wattroff(title_win, COLOR_PAIR(COLOR_CYAN)); 
-    
+    mvwaddnstr(title_win, 0, 8, TITLE, 18); 
     mvwaddnstr(title_win, 7, 5, MSG, 24);
-    wrefresh(title_win);
 
-    while(getch() != SPACE_KEY);
+    enum Color title_fish_color = CYAN;
+
+    while(getch() != SPACE_KEY){
+
+        if(rainbow_fish == 1){
+            title_fish_color = (title_fish_color++ % (COLOR_TOTAL - 1)) + 1;
+        }
+    
+        if (black_and_white == 0) wattron(title_win, COLOR_PAIR(title_fish_color));
+    
+        mvwaddnstr(title_win, 1, 1, TITLE_FISH_GRAPHIC[0], 30);
+        mvwaddnstr(title_win, 2, 1, TITLE_FISH_GRAPHIC[1], 30);
+        mvwaddnstr(title_win, 3, 1, TITLE_FISH_GRAPHIC[2], 30);
+        mvwaddnstr(title_win, 4, 1, TITLE_FISH_GRAPHIC[3], 30);
+        mvwaddnstr(title_win, 5, 1, TITLE_FISH_GRAPHIC[4], 30);
+        mvwaddnstr(title_win, 6, 1, TITLE_FISH_GRAPHIC[5], 30);
+        
+        if(black_and_white == 0) wattroff(title_win, COLOR_PAIR(title_fish_color));
+        wrefresh(title_win);
+    }
 
     wclear(title_win);
     wrefresh(title_win);
@@ -466,7 +477,7 @@ Fish create_fish(){
 
     this.counter = (rand() % 10) + 15;
 
-    this.color = (enum Color)(rand() % COLOR_TOTAL);
+    this.color = rand() % COLOR_TOTAL;
 
     return this;
 
@@ -549,6 +560,10 @@ void simulate(Fish* fishes, size_t fish_count){
 
         Fish* fish = fishes + i;
 
+        if(rainbow_fish == 1 && (fish->counter % 4) == 0){
+            fish->color = (fish->color++ % (COLOR_TOTAL - 1)) + 1;
+        }
+
         if(fish->counter == 0){
 
             fish->direction = create_fish().direction;
@@ -564,11 +579,11 @@ void simulate(Fish* fishes, size_t fish_count){
             fish->direction.isNorth = 0;
         }
 
-        if(fish->pos_x == fish_max_pos[X]){
+        if(fish->pos_x == (int)fish_max_pos[X]){
             fish->direction.isEast = 0;
         }
 
-        if(fish->pos_y == fish_max_pos[Y]){
+        if(fish->pos_y == (int)fish_max_pos[Y]){
             fish->direction.isNorth = 1;
         }
 

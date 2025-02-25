@@ -2,7 +2,7 @@
 #define VIRTUALFISH_H
 
 #define COMMAND_TOTAL 6
-#define COLOR_TOTAL 8
+#define COLOR_TOTAL 7
 
 /*
     Ascii Fish by Max Strandberg from www.asciiart.eu
@@ -26,14 +26,13 @@ enum Command {
 };
 
 enum Color {
-    DEFAULT,
-    RED,
-    GREEN,
-    YELLOW,
-    BLUE,
-    MAGENTA,
-    CYAN,
     WHITE,
+    RED,
+    YELLOW,
+    GREEN,
+    CYAN,
+    BLUE,
+    MAGENTA
 };
 
 typedef struct _DIRECTION {
