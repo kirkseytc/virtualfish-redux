@@ -122,7 +122,7 @@ Fish empty_fish();
 
 void simulate(Fish* fishes, size_t fish_count);
 
-Fish simulate_OutOfBoundsHandle(Fish fish);
+void simulate_OutOfBoundsHandle(Fish* fish);
 
 Direction simulate_NextDirection(Direction direction);
 

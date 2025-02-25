@@ -44,18 +44,9 @@ _Note: Commands are not case sensitive._
 ### Flags
 |Option|Description|
 |:-|:-|
-|`-s <seed>`|Seeds the randomizer to the amount passed in `<seed>`|
-|`-c <count>`|Sets the starting amount of fish to the amount passed in `<count>`|
-|`-m <max>`|Sets the max amount of fish possible to the amount passed in `<max>`|
+|`-sm`|Starts the game with max amount of fish spawned in.|
 |`-bw`|Starts in Black and White mode|
 |`-nt`|Skips the title screen|
-
-Example: 
-Start with 5 fish, a max of 20 fish, and skip the title screen
-
-`virtualfish -c 5 -m 20 -nt` 
-
-_Note: The order of the flags does not matter._
 
 ## Releases
 
