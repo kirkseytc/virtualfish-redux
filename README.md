@@ -1,5 +1,9 @@
 # Virtualfish Redux
-This is a "redux" of the [virtualfish project](https://www.github.com/kirkseytc/virtualfish), remaking it from scratch and impementing new features.
+Virtualfish Redux is a ground up remake of the [virtualfish project](https://www.github.com/kirkseytc/virtualfish) that aims 
+to function similar to the original while having new features to play around with.
+
+## What is Virtualfish?
+Virtualfish is a fish tank simulator that you run in your terminal built off of the ncurses library.
 
 ## Install
 ### Windows:
@@ -39,8 +43,6 @@ In this window you are able to type in commands to interact with the tank.
 |`seed`|`s`|Prints the seed|
 |`quit`|`q`|Quits the game|
 
-_Note: Commands are not case sensitive._
-
 ### Flags
 |Option|Description|
 |:-|:-|
@@ -48,8 +50,6 @@ _Note: Commands are not case sensitive._
 |`-bw`|Starts in Black and White mode|
 |`-nt`|Skips the title screen|
 |`-rf`|Makes the fish shift colors like rainbow rgb
-
-## Releases
 
 ## Why Does Redux Exist?
 Redux exists because I want to have a crack at this idea again with
