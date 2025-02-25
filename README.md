@@ -44,7 +44,7 @@ _Note: Commands are not case sensitive._
 ### Flags
 |Option|Description|
 |:-|:-|
-|`-sm`|Starts the game with max amount of fish spawned in.|
+|`-sm`|Starts the game with the max amount of fish spawned in.|
 |`-bw`|Starts in Black and White mode|
 |`-nt`|Skips the title screen|
 
