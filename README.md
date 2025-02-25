@@ -6,13 +6,16 @@ to function similar to the original while having new features to play around wit
 Virtualfish is a fish tank simulator that you run in your terminal built off of the ncurses library.
 
 ## Install
-### Windows:
-Currently there is no native Windows port, but you can use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) with the [Linux](#linux) instructions.
-### MacOS:
-Currently there is no planned native MacOS port.
-### Linux:
-> If you do not have ncurses-6.4 installed already, either build it from [source](https://invisible-island.net/ncurses/#download) or install it with your package manager
-> (example with Debian: `sudo apt-get install libncurses-dev`).
+Currently Virtualfish Redux is only available on Linux. 
+It might work on MacOS, but that is untested, but feel free to try it out! 
+For Windows, You can use [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) to run Linux programs.
+
+> To build this program you need to have `gcc` and `make` installed.
+
+> If you do not have ncurses-6.4 library installed already, either build it from [source](https://invisible-island.net/ncurses/#download)
+> or install it with your package manager.
+>
+> Example with `apt`: `sudo apt install libncurses-dev`
 
 Download the lastest [release](https://github.com/kirkseytc/virtualfish-redux/releases), unzip it, and change directory into the newly created folder.
 
@@ -28,7 +31,7 @@ To run Virtualfish Redux either run `virtualfish` or `vfish`.
 After starting execution you will be greeted with this title screen.  
 Simply press space to continue.
 
-<img src="imgs/title_screen.png" alt="Screenshot of the Title Screen" width="540">
+<img src="imgs/title_screen.png" alt="Screenshot of the Title Screen" width="640">
 
 ### Commands
 To run a command type a ':' (or ';').  
