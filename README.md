@@ -40,11 +40,18 @@ In this window you are able to type in commands to interact with the tank.
 
 |Command|Alias|Description|
 |:-|:-|:-|
+|`clear`|`c`|Clears the tank of all fish|
 |`fish`|`f`|Spawns one fish|
 |`max`|`m`|Spawns the maximum number of fish|
-|`clear`|`c`|Clears the tank of all fish|
-|`seed`|`s`|Prints the seed|
+||||
+|`castle`|`ca`|enables/disables the castle at the bottom of the screen|
+|`crab`|`cr`|enables/disables the crab at the bottom of the screen|
+|`volcano`|`v`|enables/disables the volcano at the bottom of the screen|
+||||
 |`quit`|`q`|Quits the game|
+|`seed`|`s`|Prints the seed|
+
+
 
 ### Flags
 |Option|Description|
@@ -52,7 +59,7 @@ In this window you are able to type in commands to interact with the tank.
 |`-sm`|Starts the game with the max amount of fish spawned in.|
 |`-bw`|Starts in Black and White mode|
 |`-nt`|Skips the title screen|
-|`-rf`|Makes the fish shift colors like rainbow rgb
+|`-rb`|Enables Rainbow Mode
 
 ## Why Does Redux Exist?
 Redux exists because I want to have a crack at this idea again with

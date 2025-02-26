@@ -1,39 +1,72 @@
 #ifndef VIRTUALFISH_H
 #define VIRTUALFISH_H
 
-#define COMMAND_TOTAL 6
-#define COLOR_TOTAL 7
-
 /*
-    Ascii Fish by Max Strandberg from www.asciiart.eu
+    Fantasy Tetras by by Max Strandberg from www.asciiart.eu
 */
-const char TITLE_FISH_GRAPHIC[6][40] = {
-    "            /`-._        ",
-    "          _/,.._/        ",
-    "       ,-'   ,  `-:,.-') ",    
-    "      : o ):';     _  {  ",
-    "       `-.  `' _,.-\\`-.)",
-    "          `\\\\``\\,.-'  "
+
+const char TITLE_FISH_GRAPHIC[6][20] = {
+    "      /`-._        ",
+    "    _/,.._/        ",
+    " ,-'   ,  `-:,.-') ",    
+    ": o ):';     _  {  ",
+    " `-.  `' _,.-\\`-.)",
+    "    `\\\\``\\,.-'  "
 };
 
+const char VOLCANO_GRAPHIC[4][16] = {
+    "     _____     ",
+    "    / \"\"\" \\    ",
+    "  .'       '.  ",
+    ".'           '."
+};
+
+const char CRAB_GRAPHIC[3][7] = {
+    "# ;; #",
+    " !__! ",
+    " '\"\"' "
+};
+
+const char CATLE_GRAPHIC[6][12] = {
+    "     A      ",
+    " A  /_\\  A ",
+    "/_\\ |o| /_\\",
+    "|o|-----|o|",
+    "| |' _ '| |",
+    "|_|_|||_|_|"
+};
+
+#define COMMAND_TOTAL 9
 enum Command {
     FISH,
     MAX,
     CLEAR,
     SEED,
     QUIT,
+    CASTLE,
+    CRAB,
+    VOLCANO,
     _BLANK
 };
 
+#define COLOR_TOTAL 11
 enum Color {
     WHITE,
     RED,
+    ORANGE,
     YELLOW,
     GREEN,
     CYAN,
     BLUE,
-    MAGENTA
+    MAGENTA,
+    BROWN,
+    GREY,
+    BLACK
 };
+#define COLOR_ORANGE 32
+#define COLOR_BROWN 33 
+#define COLOR_GREY 34
+
 
 typedef struct _DIRECTION {
 
@@ -67,11 +100,6 @@ int main(int argc, char** argv);
      * Handles argc & argv flags
      */
     void handle_flags(int, char**);
-
-    /**
-     * Initilizes the 8 basic color pairs for color use
-     */
-    void init_color_pairs();
 
     /**
      * Turns on terminal modifers for the game mode

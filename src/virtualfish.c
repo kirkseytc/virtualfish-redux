@@ -43,14 +43,36 @@ int main(int argc, char** argv){
     }
 
     if(black_and_white == 0){
-        if(has_colors() == 0){
+        if(can_change_color() == 0){
             endwin();
-            printf("Colors are not supported on this terminal.\n");
+            printf("Color mode is not supported on this terminal. Run with '-bw' flag.\n");
             exit(0);
         }
     
         start_color();
-        init_color_pairs();
+
+        if(COLORS < COLOR_TOTAL ){
+            endwin();
+            printf("Color mode is not supported on this terminal. Run with '-bw' flag.\n");
+            exit(0);
+        }
+
+        init_color(COLOR_ORANGE, 1000, 647, 0);
+        init_color(COLOR_BROWN, 627, 322, 176);
+        init_color(COLOR_GREY, 439, 502, 565);
+
+        init_pair((enum Color)WHITE, COLOR_WHITE, COLOR_BLACK);
+        init_pair((enum Color)RED, COLOR_RED, COLOR_BLACK);
+        init_pair((enum Color)ORANGE, COLOR_ORANGE, COLOR_BLACK);
+        init_pair((enum Color)YELLOW, COLOR_YELLOW, COLOR_BLACK);
+        init_pair((enum Color)GREEN, COLOR_GREEN, COLOR_BLACK);
+        init_pair((enum Color)CYAN, COLOR_CYAN, COLOR_BLACK);
+        init_pair((enum Color)BLUE, COLOR_BLUE, COLOR_BLACK);
+        init_pair((enum Color)MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
+        init_pair((enum Color)BROWN, COLOR_BROWN, COLOR_BLACK);
+        init_pair((enum Color)GREY, COLOR_GREY, COLOR_BLACK);
+        init_pair((enum Color)BLACK, COLOR_BLACK, COLOR_BLACK);
+
     }
 
     game_mode_on();
@@ -116,7 +138,7 @@ void handle_flags(int argc, char** argv){
         
         }
 
-        if(strcmp(argv[i], "-rf") == 0){
+        if(strcmp(argv[i], "-rb") == 0){
             
             rainbow_fish = 1;
             continue;
@@ -124,18 +146,6 @@ void handle_flags(int argc, char** argv){
         }
 
     }
-
-}
-
-void init_color_pairs(){
-
-    init_pair((enum Color)WHITE, COLOR_WHITE, COLOR_BLACK);
-    init_pair((enum Color)RED, COLOR_RED, COLOR_BLACK);
-    init_pair((enum Color)YELLOW, COLOR_YELLOW, COLOR_BLACK);
-    init_pair((enum Color)GREEN, COLOR_GREEN, COLOR_BLACK);
-    init_pair((enum Color)CYAN, COLOR_CYAN, COLOR_BLACK);
-    init_pair((enum Color)BLUE, COLOR_BLUE, COLOR_BLACK);
-    init_pair((enum Color)MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
 
 }
 
@@ -323,17 +333,14 @@ void title_screen(){
     while(getch() != SPACE_KEY){
 
         if(rainbow_fish == 1){
-            title_fish_color = (title_fish_color++ % (COLOR_TOTAL - 1)) + 1;
+            title_fish_color = (title_fish_color++ % (COLOR_TOTAL - 4)) + 1;
         }
     
         if (black_and_white == 0) wattron(title_win, COLOR_PAIR(title_fish_color));
     
-        mvwaddnstr(title_win, 1, 1, TITLE_FISH_GRAPHIC[0], 30);
-        mvwaddnstr(title_win, 2, 1, TITLE_FISH_GRAPHIC[1], 30);
-        mvwaddnstr(title_win, 3, 1, TITLE_FISH_GRAPHIC[2], 30);
-        mvwaddnstr(title_win, 4, 1, TITLE_FISH_GRAPHIC[3], 30);
-        mvwaddnstr(title_win, 5, 1, TITLE_FISH_GRAPHIC[4], 30);
-        mvwaddnstr(title_win, 6, 1, TITLE_FISH_GRAPHIC[5], 30);
+        for(size_t i = 0; i < 6; i++){
+            mvwaddnstr(title_win, (i + 1), 7, TITLE_FISH_GRAPHIC[i], 20);
+        }
         
         if(black_and_white == 0) wattroff(title_win, COLOR_PAIR(title_fish_color));
         wrefresh(title_win);
@@ -477,7 +484,7 @@ Fish create_fish(){
 
     this.counter = (rand() % 10) + 15;
 
-    this.color = rand() % COLOR_TOTAL;
+    this.color = (rand() % COLOR_TOTAL - 3);
 
     return this;
 
@@ -561,7 +568,7 @@ void simulate(Fish* fishes, size_t fish_count){
         Fish* fish = fishes + i;
 
         if(rainbow_fish == 1 && (fish->counter % 4) == 0){
-            fish->color = (fish->color++ % (COLOR_TOTAL - 1)) + 1;
+            fish->color = (fish->color++ % (COLOR_TOTAL - 4)) + 1;
         }
 
         if(fish->counter == 0){
