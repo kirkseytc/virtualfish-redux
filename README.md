@@ -38,28 +38,29 @@ To run a command type a ':' (or ';').
 This will pause gameplay and bring up an input window.  
 In this window you are able to type in commands to interact with the tank.  
 
-|Command|Alias|Description|
-|:-|:-|:-|
-|`clear`|`c`|Clears the tank of all fish|
-|`fish`|`f`|Spawns one fish|
-|`max`|`m`|Spawns the maximum number of fish|
+|Command|Description|
+|:-|:-|
+|`clear`|Clears the tank of all fish|
+|`fish`|Spawns one fish|
+|`max`|Spawns the maximum number of fish|
 ||||
-|`castle`|`ca`|enables/disables the castle at the bottom of the screen|
-|`crab`|`cr`|enables/disables the crab at the bottom of the screen|
-|`volcano`|`v`|enables/disables the volcano at the bottom of the screen|
+|`castle`|enables/disables the castle at the bottom of the screen|
+|`crab`|enables/disables the crab at the bottom of the screen|
+|`volcano`|enables/disables the volcano at the bottom of the screen|
 ||||
-|`quit`|`q`|Quits the game|
-|`seed`|`s`|Prints the seed|
+|`quit`|Quits the game|
+|`seed`|Prints the seed|
 
-
+_Note: If you only type the first few characters of a command in order, the intened command will still run. Example: `ca` will run `castle`_
 
 ### Flags
 |Option|Description|
 |:-|:-|
-|`-sm`|Starts the game with the max amount of fish spawned in.|
-|`-bw`|Starts in Black and White mode|
-|`-nt`|Skips the title screen|
-|`-rb`|Enables Rainbow Mode
+|`-bw` or `--black-and-white`|Starts game in Black and White mode.|
+|`-nt` or `--no-title`|Skips the title screen|
+|`-rb` or `--rainbow`|Starts game in Rainbow Fish mode. If the game is in Black and White mode, then nothing happens|
+|`-sm` or `--start-with-max`|Starts the game with the max amount of fish spawned in.|
+|`-v` or `--version`|Prints the version of Virtualfish Redux|
 
 ## Why Does Redux Exist?
 Redux exists because I want to have a crack at this idea again with

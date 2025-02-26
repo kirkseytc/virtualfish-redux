@@ -1,3 +1,5 @@
+const char VFR_VERSION[] = "1.1";
+
 // System Libraries
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,7 +128,7 @@ void handle_flags(int argc, char** argv){
             continue;
         }
 
-        if(strcmp(argv[i], "-sm") == 0){
+        if(strcmp(argv[i], "-sm") == 0 || strcmp(argv[i], "--start-with-max") == 0){
             
             start_count = max;
 
@@ -134,25 +136,32 @@ void handle_flags(int argc, char** argv){
 
         }
 
-        if(strcmp(argv[i], "-bw") == 0){
+        if(strcmp(argv[i], "-bw") == 0 || strcmp(argv[i], "--black-and-white") == 0){
 
             black_and_white = 1;
             continue;
 
         }
 
-        if(strcmp(argv[i], "-nt") == 0){
+        if(strcmp(argv[i], "-nt") == 0 || strcmp(argv[i], "--no-title") == 0){
             
             no_title_scr = 1;
             continue;
         
         }
 
-        if(strcmp(argv[i], "-rb") == 0){
+        if(strcmp(argv[i], "-rb") == 0 || strcmp(argv[i], "--rainbow") == 0){
             
             rainbow_fish = 1;
             continue;
         
+        }
+
+        if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0){
+
+            printf("Virtualfish Redux %s\n", VFR_VERSION);
+            exit('V');
+
         }
 
     }
@@ -196,7 +205,7 @@ void init_env(){
     // 2 => 1 from box + 1 from sand
     fish_max_pos[Y] = (getmaxy(stdscr) - 1) - 2 - tank_win_start[Y];
 
-    castle_min_x = (rand() % 11) + tank_win_start[X];
+    castle_min_x = (rand() % 11) + tank_win_start[X] + 1;
     volcano_min_x = fish_max_pos[X] - ((rand() % 11) + 17) + 2;
     crab_pos_x = rand() % (fish_max_pos[X] - 3);
     
@@ -525,7 +534,7 @@ Fish create_fish(){
 
     this.counter = (rand() % 10) + 15;
 
-    this.color = (rand() % COLOR_TOTAL - 3);
+    this.color = (rand() % (COLOR_TOTAL - 3));
 
     return this;
 
@@ -551,8 +560,6 @@ enum Command parse_command(char* parse_string, size_t parse_string_size){
             if(tmp_char != 0) return _BLANK;
 
         } 
-        
-        return CLEAR;
         
     }
 
