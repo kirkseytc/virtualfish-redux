@@ -721,7 +721,6 @@ void render(Fish* fishes, size_t fish_count){
 
         if(black_and_white == 0) attroff(COLOR_PAIR(GREY));
 
-
     }
 
     // render fish layer
