@@ -706,6 +706,26 @@ void render(Fish* fishes, size_t fish_count){
     // render bg layer
     if(volcano_on){
 
+        if(black_and_white == 0) attron(COLOR_PAIR(ORANGE));
+
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 3, volcano_min_x, VOLCANO_GRAPHIC[0], 16);
+
+        if(black_and_white == 0) attron(COLOR_PAIR(BROWN));
+
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, volcano_min_x, VOLCANO_GRAPHIC[1], 6);
+
+        if(black_and_white == 0) attron(COLOR_PAIR(ORANGE));
+
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, volcano_min_x + 6, VOLCANO_GRAPHIC[1] + 6, 3);
+
+        if(black_and_white == 0) attron(COLOR_PAIR(BROWN));
+
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, volcano_min_x + 9, VOLCANO_GRAPHIC[1] + 9, 7);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, volcano_min_x, VOLCANO_GRAPHIC[2], 16);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], volcano_min_x, VOLCANO_GRAPHIC[3], 16);
+
+        if(black_and_white == 0) attroff(COLOR_PAIR(BROWN));
+
     }
 
     if(castle_on){
