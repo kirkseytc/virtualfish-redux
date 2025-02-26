@@ -19,9 +19,13 @@
 static unsigned int seed;
 static unsigned int start_count;
 static unsigned int max;
-static unsigned char black_and_white;
-static unsigned char no_title_scr;
-static unsigned char rainbow_fish;
+static char black_and_white;
+static char no_title_scr;
+static char rainbow_fish;
+
+static char crab_on;
+static char castle_on;
+static char volcano_on;
 
 static unsigned int tank_win_start[2];
 static unsigned int fish_max_pos[2];
@@ -333,7 +337,8 @@ void title_screen(){
     while(getch() != SPACE_KEY){
 
         if(rainbow_fish == 1){
-            title_fish_color = (title_fish_color++ % (COLOR_TOTAL - 4)) + 1;
+            title_fish_color += 1;
+            title_fish_color = (title_fish_color % (COLOR_TOTAL - 4)) + 1;
         }
     
         if (black_and_white == 0) wattron(title_win, COLOR_PAIR(title_fish_color));
@@ -426,10 +431,6 @@ int update(){
                 napms(750);
                 break;
             case CLEAR:
-                
-                for(unsigned int i; i < max; i++){
-                    fishes[i] = empty_fish();
-                }
 
                 internal_count = 0;
 
@@ -447,15 +448,54 @@ int update(){
                 break;
             case QUIT:
 
-                return INT32_MAX;
-            case _BLANK:
+                return 127;
 
+            case CRAB:
+
+                if(crab_on == 0) {
+                    crab_on = 1;
+                    waddnstr(input_win, "Crab enabled.", 14);
+                } else {
+                    crab_on = 0;
+                    waddnstr(input_win, "Crab disabled.", 15);
+                }
+                
+                wrefresh(input_win);
+                napms(750);
                 break;
 
+            case CASTLE:
+
+                if(castle_on == 0){
+                    castle_on = 1;
+                    waddnstr(input_win, "Castle enabled.", 16);
+                } else {
+                    castle_on = 0;
+                    waddnstr(input_win, "Castle disabled.", 17);
+                }
+
+                wrefresh(input_win);
+                napms(750);
+                break;
+
+            case VOLCANO:
+
+                if(volcano_on == 0){
+                    volcano_on = 1;
+                    waddnstr(input_win, "Volcano enabled.", 17);
+                } else {
+                    volcano_on = 0;
+                    waddnstr(input_win, "Volcano disabled.", 18);
+                }
+
+                wrefresh(input_win);
+                napms(750);
+                break;
+
+            default:
         }
 
         delwin(input_win);
-        draw_sand(NULL);
 
     }
 
@@ -496,20 +536,30 @@ enum Command parse_command(char* parse_string, size_t parse_string_size){
         return _BLANK;
     }
 
-    parse_string[0] = toupper(parse_string[0]);
+    char tmp_char = toupper(parse_string[0]);
 
-    switch(parse_string[0]){
-        case 'F':
-            return FISH;
-        case 'M':
-            return MAX;
-        case 'C':
-            return CLEAR;
-        case 'S':
-            return SEED;
-        case 'Q':
-            return QUIT;
+    if(tmp_char == 'C'){
+        
+        if(parse_string_size > 1){
+
+            tmp_char = toupper(parse_string[1]);
+
+            if(tmp_char == 'A') return CASTLE;
+            if(tmp_char == 'R') return CRAB;
+            if(tmp_char == 'L') return CLEAR;
+            if(tmp_char != 0) return _BLANK;
+
+        } 
+        
+        return CLEAR;
+        
     }
+
+    if(tmp_char == 'F') return FISH;
+    if(tmp_char == 'M') return MAX;
+    if(tmp_char == 'S') return SEED;
+    if(tmp_char == 'V') return VOLCANO;
+    if(tmp_char == 'Q') return QUIT;
 
     return _BLANK;
 }
@@ -565,10 +615,11 @@ void simulate(Fish* fishes, size_t fish_count){
 
     for(size_t i = 0; i < fish_count; i++){
 
-        Fish* fish = fishes + i;
+        Fish* fish = (fishes + i);
 
         if(rainbow_fish == 1 && (fish->counter % 4) == 0){
-            fish->color = (fish->color++ % (COLOR_TOTAL - 4)) + 1;
+            fish->color += 1;
+            fish->color = (fish->color % (COLOR_TOTAL - 4)) + 1;
         }
 
         if(fish->counter == 0){
@@ -651,6 +702,16 @@ void render(Fish* fishes, size_t fish_count){
     refresh();
     delwin(tank);
 
+    // render bg layer
+    if(volcano_on){
+
+    }
+
+    if(castle_on){
+
+    }
+
+    // render fish layer
     // '&& i < max' might be optional, but just in case for now
     for(unsigned int i = 0; i < fish_count && i < max; i++){
 
@@ -666,6 +727,9 @@ void render(Fish* fishes, size_t fish_count){
         if(black_and_white == 0) attroff(COLOR_PAIR(fish.color));
 
     }
+
+    // render fg
+    draw_sand(NULL);
 
     
     

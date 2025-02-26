@@ -10,7 +10,7 @@ virtualfish: $(build_dir)/virtualfish.o
 $(build_dir)/virtualfish.o: $(code_dir)/virtualfish.c $(code_dir)/*.h
 	@if [ ! -d $(build_dir) ]; then echo "Creating build directory..." && mkdir $(build_dir); fi
 	@echo "Compiling..."
-	@gcc -c $< -o $(build_dir)/virtualfish.o -Wall -Wextra
+	@gcc -c -std=c99 $< -o $(build_dir)/virtualfish.o -Wall -Werror
 
 install: virtualfish
 	@echo "Installing..."
