@@ -24,10 +24,10 @@ const char VOLCANO_GRAPHIC[4][16] = {
 const char CRAB_GRAPHIC[3][7] = {
     "# ;; #",
     " !__! ",
-    " '\"\"' "
+    " \"''\" "
 };
 
-const char CATLE_GRAPHIC[6][12] = {
+const char CASTLE_GRAPHIC[6][12] = {
     "     A      ",
     " A  /_\\  A ",
     "/_\\ |o| /_\\",
@@ -137,11 +137,6 @@ int main(int argc, char** argv);
          * NOTE: Whatever c string that is stored in the static varibale will have free() called upon it when a new one is passed.
          */
         void draw_sand(char*);
-
-        /**
-         * 
-         */
-        void set_tank_win_values();
 
     /**
      * Runs title screen logic

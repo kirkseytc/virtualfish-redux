@@ -24,8 +24,14 @@ static char no_title_scr;
 static char rainbow_fish;
 
 static char crab_on;
+static unsigned int crab_pos_x;
+static char crab_direction;
+
 static char castle_on;
+static unsigned int castle_min_x;
+
 static char volcano_on;
+static unsigned int volcano_min_x;
 
 static unsigned int tank_win_start[2];
 static unsigned int fish_max_pos[2];
@@ -176,8 +182,25 @@ void init_env(){
     draw_box();
     draw_water();
     draw_sand(gen_sand());
-    set_tank_win_values();
     refresh();
+
+    // 1 => 1 from box 
+    tank_win_start[X] = 1;
+
+    // 2 => 1 from box + 1 from water
+    tank_win_start[Y] = 2;
+    
+    // 3 => 1 from box + 2 for graphics
+    fish_max_pos[X] = (getmaxx(stdscr) - 1) - 3 - tank_win_start[X];
+    
+    // 2 => 1 from box + 1 from sand
+    fish_max_pos[Y] = (getmaxy(stdscr) - 1) - 2 - tank_win_start[Y];
+
+    castle_min_x = (rand() % 11) + tank_win_start[X];
+    volcano_min_x = fish_max_pos[X] - ((rand() % 11) + 17) + 2;
+    crab_pos_x = rand() % (fish_max_pos[X] - 3);
+    
+    crab_direction = rand() % 2;
 
 }
 
@@ -296,30 +319,6 @@ void draw_sand(char* sand_pat){
     mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
     
     if(black_and_white == 0) attroff(COLOR_PAIR(YELLOW) | A_BOLD);
-
-}
-
-void set_tank_win_values(){
-
-    /**
-     * 1 => 1 from box
-    */ 
-    tank_win_start[X] = 1;
-
-    /**
-     * 2 => 1 from box + 1 from water
-     */
-    tank_win_start[Y] = 2;
-
-    /**
-     * 3 => 1 from box + 2 for graphics
-     */
-    fish_max_pos[X] = (getmaxx(stdscr) - 1) - 3 - tank_win_start[X];
-
-    /**
-     * 2 => 1 from box + 1 from sand
-     */
-    fish_max_pos[Y] = (getmaxy(stdscr) - 1) - 2 - tank_win_start[Y];
 
 }
 
@@ -496,6 +495,8 @@ int update(){
         }
 
         delwin(input_win);
+
+        draw_sand(NULL);
 
     }
 
@@ -709,13 +710,25 @@ void render(Fish* fishes, size_t fish_count){
 
     if(castle_on){
 
+        if(black_and_white == 0) attron(COLOR_PAIR(GREY));
+
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 5, castle_min_x, CASTLE_GRAPHIC[0], 12);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 4, castle_min_x, CASTLE_GRAPHIC[1], 12);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 3, castle_min_x, CASTLE_GRAPHIC[2], 12);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, castle_min_x, CASTLE_GRAPHIC[3], 12);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, castle_min_x, CASTLE_GRAPHIC[4], 12);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], castle_min_x, CASTLE_GRAPHIC[5], 12);
+
+        if(black_and_white == 0) attroff(COLOR_PAIR(GREY));
+
+
     }
 
     // render fish layer
-    // '&& i < max' might be optional, but just in case for now
-    for(unsigned int i = 0; i < fish_count && i < max; i++){
+    for(unsigned int i = 0; i < fish_count; i++){
 
-        Fish fish = fishes[i];
+        static Fish fish = {}; 
+        fish = fishes[i];
 
         if(black_and_white == 0) attron(COLOR_PAIR(fish.color));
 
@@ -729,7 +742,35 @@ void render(Fish* fishes, size_t fish_count){
     }
 
     // render fg
-    draw_sand(NULL);
+    if(crab_on){
+
+        draw_sand(NULL);
+
+        if(crab_direction == 1){ // heading east
+            crab_pos_x++;
+        } else {
+            crab_pos_x--;
+        }
+
+        if(integer_clamp((int *)&crab_pos_x, tank_win_start[X], fish_max_pos[X] - 2)){
+
+            if(crab_direction){
+                crab_direction = 0;
+            } else {
+                crab_direction = 1;
+            }
+
+        }
+
+        if(black_and_white == 0) attron(COLOR_PAIR(RED) | A_BOLD);
+
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, crab_pos_x, CRAB_GRAPHIC[0], 7);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], crab_pos_x, CRAB_GRAPHIC[1], 7);
+        mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] + 1, crab_pos_x, CRAB_GRAPHIC[2], 7);
+
+        if(black_and_white == 0) attroff(COLOR_PAIR(RED) | A_BOLD);
+
+    }
 
     
     
