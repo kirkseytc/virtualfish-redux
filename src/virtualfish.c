@@ -1,4 +1,4 @@
-const char VFR_VERSION[] = "1.2.1";
+const char VFR_VERSION[] = "1.2.2";
 
 // System Libraries
 #include <stdio.h>

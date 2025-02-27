@@ -25,3 +25,7 @@ clean:
 	@if [ -d $(build_dir) ]; then echo "Cleaning objects..." && rm -rf $(build_dir); fi;
 	@if [ -f virtualfish ]; then echo "Cleaning executables..." && rm virtualfish; fi;
 	@echo "Done!"
+
+release:
+	@zip -q -r virtualfish-redux.zip src makefile README.md
+	@echo "Done!"
