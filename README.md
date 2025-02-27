@@ -60,6 +60,7 @@ _Note: If you only type the first few characters of a command in order, the inte
 |`-nt` or `--no-title`|Skips the title screen|
 |`-rb` or `--rainbow`|Starts game in Rainbow Fish mode. If the game is in Black and White mode, then nothing happens|
 |`-sm` or `--start-with-max`|Starts the game with the max amount of fish spawned in.|
+|`-cg` or `--colored-gravel`|Replaces the sand with colored gravel|
 |`-v` or `--version`|Prints the version of Virtualfish Redux|
 
 ## Why Does Redux Exist?

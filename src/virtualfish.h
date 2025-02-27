@@ -173,12 +173,6 @@ int main(int argc, char** argv);
          */
         enum Command parse_command(char* parse_string, size_t parse_string_size);
 
-
-        /**
-         * Returns an initalized fish with empty fields
-         */
-        Fish empty_fish();
-
         /**
          * Converts an integer into a string and stores in the string passed
          */

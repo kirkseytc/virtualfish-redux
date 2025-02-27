@@ -341,12 +341,71 @@ void draw_sand(char* sand_pat){
 
     int sand_offset = 2;
 
-    if(black_and_white == 0) attron(COLOR_PAIR(YELLOW) | A_BOLD);
+    if(black_and_white == 0){
+
+        if(colored_gravel == 0) {
+
+            attron(COLOR_PAIR(YELLOW) | A_BOLD);
     
+            mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
+        
+            attroff(A_COLOR | A_BOLD);
+
+            return;
+
+        }
+
+        int index = 0;
+        int length = strlen(sand_pattern);
+
+        static int color_lookup[64];
+        
+        if(color_lookup[0] == 0){ // create lookup table on first run
+
+            for(int i = 0; i < 64; i++){
+
+                int color_length = (rand() % 2) + 1;
+                int color = (rand() % 5) + 10;
+
+                if(i > 1){
+                   
+                    while(color == color_lookup[i - 1]){
+                        color = (rand() % 5) + 10;
+                    }
+
+                }
+
+                while(color_length > 0 && i < 64){
+
+                    color_lookup[i] = color;
+
+                    if(color_length != 1) i++;
+                    color_length--;
+
+                }
+
+            }
+
+        }
+
+        while(index < length){
+
+            attron(COLOR_PAIR(color_lookup[index % 64]));
+
+            mvaddch((getmaxy(stdscr) - sand_offset), index + 1, '@');
+
+            index++;
+            
+        }
+
+        attroff(A_COLOR);
+
+        return;
+
+    }
+
     mvprintw((getmaxy(stdscr) - sand_offset), 1, "%s", sand_pattern);
     
-    if(black_and_white == 0) attroff(COLOR_PAIR(YELLOW) | A_BOLD);
-
 }
 
 void title_screen(){
@@ -373,7 +432,7 @@ void title_screen(){
             mvwaddnstr(title_win, (i + 1), 7, TITLE_FISH_GRAPHIC[i], 20);
         }
         
-        if(black_and_white == 0) wattroff(title_win, COLOR_PAIR(title_fish_color));
+        if(black_and_white == 0) wattroff(title_win, A_COLOR);
         wrefresh(title_win);
     }
 
@@ -590,11 +649,6 @@ enum Command parse_command(char* parse_string, size_t parse_string_size){
     return _BLANK;
 }
 
-Fish empty_fish(){
-    static Fish empty = {};
-    return empty;
-}
-
 void itocstr(int integer, char* string, size_t str_size){
 
     if(string == NULL || str_size == 0){
@@ -749,7 +803,7 @@ void render(Fish* fishes, size_t fish_count){
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, volcano_min_x, VOLCANO_GRAPHIC[2], 16);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], volcano_min_x, VOLCANO_GRAPHIC[3], 16);
 
-        if(black_and_white == 0) attroff(COLOR_PAIR(VOL_BROWN));
+        if(black_and_white == 0) attroff(A_COLOR);
 
     }
 
@@ -764,7 +818,7 @@ void render(Fish* fishes, size_t fish_count){
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, castle_min_x, CASTLE_GRAPHIC[4], 12);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], castle_min_x, CASTLE_GRAPHIC[5], 12);
 
-        if(black_and_white == 0) attroff(COLOR_PAIR(CAST_GREY));
+        if(black_and_white == 0) attroff(A_COLOR);
 
     }
 
@@ -781,7 +835,7 @@ void render(Fish* fishes, size_t fish_count){
 
         mvaddnstr(fish.pos_y + tank_win_start[Y], fish.pos_x + tank_win_start[X], graphic, FISH_GRAPHIC_SIZE);
         
-        if(black_and_white == 0) attroff(COLOR_PAIR(fish.color));
+        if(black_and_white == 0) attroff(A_COLOR);
 
     }
 
@@ -812,7 +866,7 @@ void render(Fish* fishes, size_t fish_count){
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], crab_pos_x, CRAB_GRAPHIC[1], 7);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] + 1, crab_pos_x, CRAB_GRAPHIC[2], 7);
 
-        if(black_and_white == 0) attroff(COLOR_PAIR(RED) | A_BOLD);
+        if(black_and_white == 0) attroff(A_COLOR | A_BOLD);
 
     }
 
