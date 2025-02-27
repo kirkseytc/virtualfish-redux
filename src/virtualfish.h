@@ -68,10 +68,10 @@ enum Ext_Color {
     VOL_BROWN = 8, // #a1522d
     CAST_GREY = 9, // #708191
     GRAV_ORANGE = 10, // #ff7700
-    GRAV_PINK = 11, // #ff90ea
+    GRAV_PINK = 11, // #fc00ce
     GRAV_BLUE = 12, // #007fff
     GRAV_GREEN = 13, // #8fff00
-    GRAV_YELLOW = 14 // #fffd90
+    GRAV_YELLOW = 14 // #fffb00
 };
 #define COLOR_VOL_BROWN 33 
 #define COLOR_CAST_GREY 34

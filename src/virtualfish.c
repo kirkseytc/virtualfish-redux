@@ -1,4 +1,4 @@
-const char VFR_VERSION[] = "1.2";
+const char VFR_VERSION[] = "1.2.1";
 
 // System Libraries
 #include <stdio.h>
@@ -73,11 +73,11 @@ int main(int argc, char** argv){
         init_color(COLOR_ORANGE, 1000, 647, 0);
         init_color(COLOR_VOL_BROWN, 627, 322, 176);
         init_color(COLOR_CAST_GREY, 439, 502, 565);
-        init_color(COLOR_GRAV_ORANGE, 1000, 467, 0);
-        init_color(COLOR_GRAV_PINK, 1000, 565, 918);
+        init_color(COLOR_GRAV_ORANGE, 1000, 361, 0);
+        init_color(COLOR_GRAV_PINK, 1000, 63, 941);
         init_color(COLOR_GRAV_BLUE, 0, 500, 1000);
-        init_color(COLOR_GRAV_GREEN, 561, 1000, 0);
-        init_color(COLOR_GRAV_YELLOW, 1000, 992, 565);
+        init_color(COLOR_GRAV_GREEN, 224, 1000, 78);
+        init_color(COLOR_GRAV_YELLOW, 1000, 984, 0);
 
         init_pair((enum Color)WHITE, COLOR_WHITE, COLOR_BLACK);
         init_pair((enum Color)RED, COLOR_RED, COLOR_BLACK);
