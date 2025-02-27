@@ -1,4 +1,4 @@
-const char VFR_VERSION[] = "1.1";
+const char VFR_VERSION[] = "1.2";
 
 // System Libraries
 #include <stdio.h>
@@ -24,6 +24,7 @@ static unsigned int max;
 static char black_and_white;
 static char no_title_scr;
 static char rainbow_fish;
+static char colored_gravel;
 
 static char crab_on;
 static unsigned int crab_pos_x;
@@ -70,8 +71,13 @@ int main(int argc, char** argv){
         }
 
         init_color(COLOR_ORANGE, 1000, 647, 0);
-        init_color(COLOR_BROWN, 627, 322, 176);
-        init_color(COLOR_GREY, 439, 502, 565);
+        init_color(COLOR_VOL_BROWN, 627, 322, 176);
+        init_color(COLOR_CAST_GREY, 439, 502, 565);
+        init_color(COLOR_GRAV_ORANGE, 1000, 467, 0);
+        init_color(COLOR_GRAV_PINK, 1000, 565, 918);
+        init_color(COLOR_GRAV_BLUE, 0, 500, 1000);
+        init_color(COLOR_GRAV_GREEN, 561, 1000, 0);
+        init_color(COLOR_GRAV_YELLOW, 1000, 992, 565);
 
         init_pair((enum Color)WHITE, COLOR_WHITE, COLOR_BLACK);
         init_pair((enum Color)RED, COLOR_RED, COLOR_BLACK);
@@ -81,10 +87,15 @@ int main(int argc, char** argv){
         init_pair((enum Color)CYAN, COLOR_CYAN, COLOR_BLACK);
         init_pair((enum Color)BLUE, COLOR_BLUE, COLOR_BLACK);
         init_pair((enum Color)MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-        init_pair((enum Color)BROWN, COLOR_BROWN, COLOR_BLACK);
-        init_pair((enum Color)GREY, COLOR_GREY, COLOR_BLACK);
-        init_pair((enum Color)BLACK, COLOR_BLACK, COLOR_BLACK);
 
+        init_pair((enum Ext_Color)VOL_BROWN, COLOR_VOL_BROWN, COLOR_BLACK);
+        init_pair((enum Ext_Color)CAST_GREY, COLOR_CAST_GREY, COLOR_BLACK);
+        init_pair((enum Ext_Color)GRAV_ORANGE, COLOR_GRAV_ORANGE, COLOR_BLACK);
+        init_pair((enum Ext_Color)GRAV_PINK, COLOR_GRAV_PINK, COLOR_BLACK);
+        init_pair((enum Ext_Color)GRAV_BLUE, COLOR_GRAV_BLUE, COLOR_BLACK);
+        init_pair((enum Ext_Color)GRAV_GREEN, COLOR_GRAV_GREEN, COLOR_BLACK);
+        init_pair((enum Ext_Color)GRAV_YELLOW, COLOR_GRAV_YELLOW, COLOR_BLACK);
+        
     }
 
     game_mode_on();
@@ -153,6 +164,13 @@ void handle_flags(int argc, char** argv){
         if(strcmp(argv[i], "-rb") == 0 || strcmp(argv[i], "--rainbow") == 0){
             
             rainbow_fish = 1;
+            continue;
+        
+        }
+        
+        if(strcmp(argv[i], "-cg") == 0 || strcmp(argv[i], "--colored-gravel") == 0){
+            
+            colored_gravel = 1;
             continue;
         
         }
@@ -717,7 +735,7 @@ void render(Fish* fishes, size_t fish_count){
 
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 3, volcano_min_x, VOLCANO_GRAPHIC[0], 16);
 
-        if(black_and_white == 0) attron(COLOR_PAIR(BROWN));
+        if(black_and_white == 0) attron(COLOR_PAIR(VOL_BROWN));
 
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, volcano_min_x, VOLCANO_GRAPHIC[1], 6);
 
@@ -725,19 +743,19 @@ void render(Fish* fishes, size_t fish_count){
 
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, volcano_min_x + 6, VOLCANO_GRAPHIC[1] + 6, 3);
 
-        if(black_and_white == 0) attron(COLOR_PAIR(BROWN));
+        if(black_and_white == 0) attron(COLOR_PAIR(VOL_BROWN));
 
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 2, volcano_min_x + 9, VOLCANO_GRAPHIC[1] + 9, 7);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, volcano_min_x, VOLCANO_GRAPHIC[2], 16);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], volcano_min_x, VOLCANO_GRAPHIC[3], 16);
 
-        if(black_and_white == 0) attroff(COLOR_PAIR(BROWN));
+        if(black_and_white == 0) attroff(COLOR_PAIR(VOL_BROWN));
 
     }
 
     if(castle_on){
 
-        if(black_and_white == 0) attron(COLOR_PAIR(GREY));
+        if(black_and_white == 0) attron(COLOR_PAIR(CAST_GREY));
 
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 5, castle_min_x, CASTLE_GRAPHIC[0], 12);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 4, castle_min_x, CASTLE_GRAPHIC[1], 12);
@@ -746,7 +764,7 @@ void render(Fish* fishes, size_t fish_count){
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y] - 1, castle_min_x, CASTLE_GRAPHIC[4], 12);
         mvaddnstr(fish_max_pos[Y] + tank_win_start[Y], castle_min_x, CASTLE_GRAPHIC[5], 12);
 
-        if(black_and_white == 0) attroff(COLOR_PAIR(GREY));
+        if(black_and_white == 0) attroff(COLOR_PAIR(CAST_GREY));
 
     }
 

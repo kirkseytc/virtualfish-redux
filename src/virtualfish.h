@@ -49,23 +49,38 @@ enum Command {
     _BLANK
 };
 
-#define COLOR_TOTAL 11
+#define COLOR_TOTAL 8
 enum Color {
     WHITE,
     RED,
-    ORANGE,
+    ORANGE, // #ffa600
     YELLOW,
     GREEN,
     CYAN,
     BLUE,
     MAGENTA,
-    BROWN,
-    GREY,
-    BLACK
 };
 #define COLOR_ORANGE 32
-#define COLOR_BROWN 33 
-#define COLOR_GREY 34
+
+
+#define EXT_COLOR_TOTAL 7
+enum Ext_Color {
+    VOL_BROWN = 8, // #a1522d
+    CAST_GREY = 9, // #708191
+    GRAV_ORANGE = 10, // #ff7700
+    GRAV_PINK = 11, // #ff90ea
+    GRAV_BLUE = 12, // #007fff
+    GRAV_GREEN = 13, // #8fff00
+    GRAV_YELLOW = 14 // #fffd90
+};
+#define COLOR_VOL_BROWN 33 
+#define COLOR_CAST_GREY 34
+#define COLOR_GRAV_ORANGE 35
+#define COLOR_GRAV_PINK 36
+#define COLOR_GRAV_BLUE 37
+#define COLOR_GRAV_GREEN 38
+#define COLOR_GRAV_YELLOW 39
+
 
 
 typedef struct _DIRECTION {
