@@ -16,6 +16,8 @@ const char VFR_VERSION[] = "1.2.2";
 #define Y 1
 #define SPACE_KEY 32
 #define FISH_GRAPHIC_SIZE 4
+#define MAX_BUBBLES 4
+#define MAX_FISH 10
 
 // Gloabl Variables
 static unsigned int seed;
@@ -38,6 +40,9 @@ static unsigned int volcano_min_x;
 
 static unsigned int tank_win_start[2];
 static unsigned int fish_max_pos[2];
+
+static Fish fishes[MAX_FISH];
+static int fish_cnt;
 
 int main(int argc, char** argv){
 
@@ -229,6 +234,17 @@ void init_env(){
     
     crab_direction = rand() % 2;
 
+    if(start_count != fish_cnt){
+
+        while(fish_cnt < start_count && fish_cnt < MAX_FISH){
+
+            fishes[fish_cnt] = create_fish();
+            fish_cnt += 1;
+
+        }
+
+    }
+
 }
 
 void draw_box(){
@@ -241,38 +257,28 @@ void draw_box(){
 
 void draw_water(){ 
 
-    const char WATER_CHR[] = {'-', '.', '_'};
-    const int WATER_OFFSET = 2;
-    const int WATER_START = 1;
-    const int WATER_Y = 1;
+    static char water_chr[] = {'-','.','_'};
 
-    const int SIZE = getmaxx(stdscr) - WATER_OFFSET;
+    /*
+        0-1 -> shift right
+        2-5, 8-11 -> do nothing
+        6-7 -> shift left
+    
+    */
+    static int8_t frame_cnt = 0;
+
+    static int size = 0;
+    static int x_offset = 1;
+
+    if(size == 0){
+        size = getmaxx(stdscr) - 3;
+    }
 
     if(black_and_white == 0) attron(COLOR_PAIR(CYAN) | A_BOLD);
 
-    for(int counter = 0; counter < SIZE; counter++){
+    for(int index = 0; index < size; index++){
 
-        int x = WATER_START + counter; // gets cursor x pos
-        char ch = 0;
-
-        switch(counter % 8){ // selects the character in the water pattern to draw
-            case 0:
-            case 1:
-                ch = WATER_CHR[0];
-                break;
-            case 2:
-            case 3:
-            case 6:
-            case 7:
-                ch = WATER_CHR[1];
-                break;
-            case 4:
-            case 5:
-                ch = WATER_CHR[2];
-                break;
-        }
-
-        mvaddch(WATER_Y, x, ch); // puts character to screen
+        // todo water anim logic
 
     }
 
@@ -445,21 +451,6 @@ void title_screen(){
 
 int update(){
 
-    static Fish* fishes = NULL;
-    static unsigned int internal_count = 0;
-
-    // allocate on first run
-    if(fishes == NULL){
-        if((fishes = malloc(sizeof(Fish) * max)) == NULL) return 1;
-
-        if(internal_count != start_count){
-            while(internal_count < start_count){
-                fishes[internal_count] = create_fish();
-                internal_count++;
-            }
-        }
-    }
-
     // read input
 
     char input = getch();
@@ -483,15 +474,15 @@ int update(){
 
             case FISH:
                 
-                if(internal_count == max){
+                if(fish_cnt == max){
                     waddnstr(input_win, "Maximum amount of fish already exist.", 38);
                     wrefresh(input_win);
                     napms(750);
                     break;
                 }
 
-                fishes[internal_count] = create_fish();
-                internal_count++;
+                fishes[fish_cnt] = create_fish();
+                fish_cnt++;
 
                 waddnstr(input_win, "Spawning Fish.", 15);
                 wrefresh(input_win);
@@ -499,16 +490,16 @@ int update(){
                 break;
             case MAX:
                 
-                if(internal_count == max){
+                if(fish_cnt == max){
                     waddnstr(input_win, "Maximum amount of fish already exist.", 38);
                     wrefresh(input_win);
                     napms(750);
                     break;
                 }
 
-                while(internal_count < max){
-                    fishes[internal_count] = create_fish();
-                    internal_count++;
+                while(fish_cnt < max){
+                    fishes[fish_cnt] = create_fish();
+                    fish_cnt++;
                 }
 
                 waddnstr(input_win, "Spawning maximum fish", 22);
@@ -517,7 +508,7 @@ int update(){
                 break;
             case CLEAR:
 
-                internal_count = 0;
+                fish_cnt = 0;
 
                 waddnstr(input_win, "Clearing fish.", 15);
                 wrefresh(input_win);
@@ -588,11 +579,29 @@ int update(){
 
     // simulation logic
 
-    simulate(fishes, internal_count);
+    simulate();
+
+    if(crab_on == 1){
+        if(crab_direction == 1){ // heading east
+            crab_pos_x++;
+        } else {
+            crab_pos_x--;
+        }
+
+        if(integer_clamp((int *)&crab_pos_x, tank_win_start[X], fish_max_pos[X] - 2)){
+
+            if(crab_direction == 1){
+                crab_direction = 0;
+            } else {
+                crab_direction = 1;
+            }
+
+        }
+    }
 
     // render fish
 
-    render(fishes, internal_count);
+    render();
 
     return 0;
 
@@ -691,9 +700,9 @@ void itocstr(int integer, char* string, size_t str_size){
 
 }
 
-void simulate(Fish* fishes, size_t fish_count){
+void simulate(){
 
-    for(size_t i = 0; i < fish_count; i++){
+    for(int8_t i = 0; i < fish_cnt; i++){
 
         Fish* fish = (fishes + i);
 
@@ -775,7 +784,7 @@ int integer_clamp(int* num, int min, int max){
     return 0;
 }
 
-void render(Fish* fishes, size_t fish_count){
+void render(){
 
     WINDOW* tank = derwin(stdscr, fish_max_pos[Y] + 1, (fish_max_pos[X] + 1) + 2, tank_win_start[Y], tank_win_start[X]);
     wclear(tank);
@@ -823,9 +832,9 @@ void render(Fish* fishes, size_t fish_count){
     }
 
     // render fish layer
-    for(unsigned int i = 0; i < fish_count; i++){
+    for(int8_t i = 0; i < fish_cnt; i++){
 
-        static Fish fish = {}; 
+        static Fish fish; 
         fish = fishes[i];
 
         if(black_and_white == 0) attron(COLOR_PAIR(fish.color));
@@ -843,22 +852,6 @@ void render(Fish* fishes, size_t fish_count){
     if(crab_on){
 
         draw_sand(NULL);
-
-        if(crab_direction == 1){ // heading east
-            crab_pos_x++;
-        } else {
-            crab_pos_x--;
-        }
-
-        if(integer_clamp((int *)&crab_pos_x, tank_win_start[X], fish_max_pos[X] - 2)){
-
-            if(crab_direction){
-                crab_direction = 0;
-            } else {
-                crab_direction = 1;
-            }
-
-        }
 
         if(black_and_white == 0) attron(COLOR_PAIR(RED) | A_BOLD);
 

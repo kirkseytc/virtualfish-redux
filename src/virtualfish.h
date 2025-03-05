@@ -104,6 +104,15 @@ typedef struct _FISH {
 
 } Fish ;
 
+typedef struct _BUBBLE {
+
+    int x;
+    int y;
+
+    char graphic;
+
+} Bubble;
+
 int main(int argc, char** argv);
 
     /**
@@ -181,7 +190,7 @@ int main(int argc, char** argv);
         /**
          * Runs simulation logic in the update loop
          */
-        void simulate(Fish* fishes, size_t fish_count);
+        void simulate();
 
             /**
              * Handles Out of bounds conditions for simulation logic
@@ -197,6 +206,6 @@ int main(int argc, char** argv);
         /**
          * Handles the render logic of the update loop
          */
-        void render(Fish* fishes, size_t fish_count);
+        void render();
 
 #endif
