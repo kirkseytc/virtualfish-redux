@@ -211,9 +211,9 @@ void game_mode_off(){
 
 void init_env(){ 
 
-    draw_box();
     draw_water();
     draw_sand(gen_sand());
+    draw_box();
     refresh();
 
     // 1 => 1 from box 
@@ -257,18 +257,25 @@ void draw_box(){
 
 void draw_water(){ 
 
-    static char water_chr[] = {'-','.','_'};
+    static char skip_frame = 0;
+
+    if(skip_frame == 1){
+        skip_frame = 0;
+        return;
+    } else {
+        skip_frame = 1;
+    }
 
     /*
-        0-1 -> shift right
-        2-5, 8-11 -> do nothing
-        6-7 -> shift left
-    
+        0-1 -> 0
+        2,5 -> 1
+        3-4 -> 2
+        
     */
     static int8_t frame_cnt = 0;
 
     static int size = 0;
-    static int x_offset = 1;
+    int x_offset = 1;
 
     if(size == 0){
         size = getmaxx(stdscr) - 3;
@@ -276,10 +283,29 @@ void draw_water(){
 
     if(black_and_white == 0) attron(COLOR_PAIR(CYAN) | A_BOLD);
 
-    for(int index = 0; index < size; index++){
+    char water_pattern[10] = {};
 
-        // todo water anim logic
+    switch(frame_cnt){
+        case 0:
+        case 1:
+            strcpy(water_pattern, "--..__..");
+            break;
+        case 2:
+        case 5:
+            strcpy(water_pattern, "-..__..-");
+            break;
+        case 3:
+        case 4:
+            strcpy(water_pattern, "..__..--");
+            break;
+    }
+    
+    frame_cnt++;
+    frame_cnt = frame_cnt % 6;
 
+    while(x_offset < size){
+        mvaddnstr(1, x_offset, water_pattern, 8);
+        x_offset += 8;
     }
 
     if(black_and_white == 0) attroff(COLOR_PAIR(CYAN) | A_BOLD);
@@ -429,7 +455,8 @@ void title_screen(){
 
         if(rainbow_fish == 1){
             title_fish_color += 1;
-            title_fish_color = (title_fish_color % (COLOR_TOTAL - 4)) + 1;
+            title_fish_color = (title_fish_color % (COLOR_TOTAL));
+            if(title_fish_color == WHITE) title_fish_color = RED;
         }
     
         if (black_and_white == 0) wattron(title_win, COLOR_PAIR(title_fish_color));
@@ -620,7 +647,9 @@ Fish create_fish(){
 
     this.counter = (rand() % 10) + 15;
 
-    this.color = (rand() % (COLOR_TOTAL - 3));
+    this.color = rand() % COLOR_TOTAL;
+
+    if(rainbow_fish == 1 && this.color == WHITE) this.color = RED;
 
     return this;
 
@@ -708,7 +737,8 @@ void simulate(){
 
         if(rainbow_fish == 1 && (fish->counter % 4) == 0){
             fish->color += 1;
-            fish->color = (fish->color % (COLOR_TOTAL - 4)) + 1;
+            fish->color = (fish->color % (COLOR_TOTAL));
+            if(fish->color == WHITE) fish->color = RED;
         }
 
         if(fish->counter == 0){
@@ -831,6 +861,8 @@ void render(){
 
     }
 
+    draw_water();
+
     // render fish layer
     for(int8_t i = 0; i < fish_cnt; i++){
 
@@ -863,6 +895,6 @@ void render(){
 
     }
 
-    
-    
+    draw_box();
+
 }

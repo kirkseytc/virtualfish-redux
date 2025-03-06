@@ -104,15 +104,6 @@ typedef struct _FISH {
 
 } Fish ;
 
-typedef struct _BUBBLE {
-
-    int x;
-    int y;
-
-    char graphic;
-
-} Bubble;
-
 int main(int argc, char** argv);
 
     /**
