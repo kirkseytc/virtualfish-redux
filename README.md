@@ -55,7 +55,7 @@ _Note: If you only type the first few characters of a command in order, the inte
 
 ### Flags
 |Option|Description|
-|:-|:-|
+|:-----------------------------------|:-|
 |`-h` or `--help`|Prints the help screen|
 |`-v` or `--version`|Prints the version|
 |`-bw` or `--black-and-white`|Starts game in Black and White mode|
