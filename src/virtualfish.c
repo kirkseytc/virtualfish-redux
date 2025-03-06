@@ -187,6 +187,23 @@ void handle_flags(int argc, char** argv){
 
         }
 
+        if(strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0){
+
+            printf("Usage: virtualfish [OPTION(S)]\n");
+            printf("an aquarium simulator\n\n");
+
+            printf("  -h\t--help\t\t\tPrints the help screen\n");
+            printf("  -v\t--version\t\tPrints the version\n");
+            printf("  -bw\t--black-and-white\tStarts game in Black and White mode\n");
+            printf("  -nt\t--no-title\t\tSkips the title screen\n");
+            printf("  -rb\t--rainbow\t\tStarts game in Rainbow Fish mode. If the game is in Black and White mode, then nothing happens\n");
+            printf("  -sm\t--start-with-max\tStarts the game with the max amount of fish spawned in\n");
+            printf("  -cg\t--colored-gravel\tReplaces the sand with colored gravel\n\n");
+
+            exit('H');
+
+        }
+
     }
 
 }

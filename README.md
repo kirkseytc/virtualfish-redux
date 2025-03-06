@@ -3,7 +3,7 @@ Virtualfish Redux is a ground up remake of the [virtualfish project](https://www
 to function similar to the original while having new features to play around with.
 
 ## What is Virtualfish?
-Virtualfish is a fish tank simulator that you run in your terminal built off of the ncurses library.
+Virtualfish is an aquarium simulator that you run in your terminal built off of the ncurses library.
 
 ## Install
 Currently Virtualfish Redux is only available on Linux. 
@@ -56,12 +56,13 @@ _Note: If you only type the first few characters of a command in order, the inte
 ### Flags
 |Option|Description|
 |:-|:-|
-|`-bw` or `--black-and-white`|Starts game in Black and White mode.|
+|`-h` or `--help`|Prints the help screen|
+|`-v` or `--version`|Prints the version|
+|`-bw` or `--black-and-white`|Starts game in Black and White mode|
 |`-nt` or `--no-title`|Skips the title screen|
 |`-rb` or `--rainbow`|Starts game in Rainbow Fish mode. If the game is in Black and White mode, then nothing happens|
-|`-sm` or `--start-with-max`|Starts the game with the max amount of fish spawned in.|
+|`-sm` or `--start-with-max`|Starts the game with the max amount of fish spawned in|
 |`-cg` or `--colored-gravel`|Replaces the sand with colored gravel|
-|`-v` or `--version`|Prints the version of Virtualfish Redux|
 
 ## Why Does Redux Exist?
 Redux exists because I want to have a crack at this idea again with
