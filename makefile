@@ -19,7 +19,7 @@ install: virtualfish
 	@echo "'virtualfish' is installed."
 
 uninstall:
-	@if [ -f $(install_dir)/virtualfish ]; then rm $(install_dir)/virtualfish; else echo "'virtualfish' is not installed. Nothing happened"; fi;
+	@if [ -f $(install_dir)/virtualfish ]; then rm $(install_dir)/virtualfish $(install_dir)/vfish; else echo "'virtualfish' is not installed. Nothing happened"; fi;
 
 clean:
 	@if [ -d $(build_dir) ]; then echo "Cleaning objects..." && rm -rf $(build_dir); fi;
