@@ -346,10 +346,12 @@ void draw_water(){
     frame_cnt++;
     frame_cnt = frame_cnt % 22;
 
-    while(x_offset < size){
+    while(x_offset < size - 9){
         mvaddnstr(1, x_offset, water_pattern, 10);
         x_offset += 10;
     }
+
+    mvaddnstr(1, x_offset, water_pattern, (size - x_offset + 2));
 
     if(black_and_white == 0) attroff(COLOR_PAIR(CYAN) | A_BOLD);
 
