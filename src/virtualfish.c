@@ -299,46 +299,46 @@ void draw_water(){
     switch(frame_cnt){
         case 0:
         case 11:
-            strcpy(water_pattern, ".----.____");
+            strncpy(water_pattern, ".----.____", 11);
             break;
         case 1:
         case 10:
-            strcpy(water_pattern, "_.----.___");
+            strncpy(water_pattern, "_.----.___", 11);
             break;
         case 2:
         case 9:
-            strcpy(water_pattern, "__.----.__");
+            strncpy(water_pattern, "__.----.__", 11);
             break;
         case 3:
         case 8:
-            strcpy(water_pattern, "___.----._");
+            strncpy(water_pattern, "___.----._", 11);
             break;
         case 4:
         case 7:
-            strcpy(water_pattern, "____.----.");
+            strncpy(water_pattern, "____.----.", 11);
             break;
         case 5:
         case 6:
         case 16:
         case 17:
-            strcpy(water_pattern, ".____.----");
+            strncpy(water_pattern, ".____.----", 11);
             break;
 
         case 12:
         case 21:
-            strcpy(water_pattern, "----.____.");
+            strncpy(water_pattern, "----.____.", 11);
             break;
         case 13:
         case 20:
-            strcpy(water_pattern, "---.____.-");
+            strncpy(water_pattern, "---.____.-", 11);
             break;
         case 14:
         case 19:
-            strcpy(water_pattern, "--.____.--");
+            strncpy(water_pattern, "--.____.--", 11);
             break;
         case 15:
         case 18:
-            strcpy(water_pattern, "-.____.---");
+            strncpy(water_pattern, "-.____.---", 11);
             break;
 
     }
@@ -917,7 +917,7 @@ void render(){
         if(black_and_white == 0) attron(COLOR_PAIR(fish.color));
 
         char graphic[FISH_GRAPHIC_SIZE] = "<><";
-        if(fish.direction.isEast) strcpy(graphic, "><>");
+        if(fish.direction.isEast) strncpy(graphic, "><>", FISH_GRAPHIC_SIZE);
 
         mvaddnstr(fish.pos_y + tank_win_start[Y], fish.pos_x + tank_win_start[X], graphic, FISH_GRAPHIC_SIZE);
         
