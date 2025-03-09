@@ -1,4 +1,4 @@
-const char VFR_VERSION[] = "1.2.2";
+const char VFR_VERSION[] = "1.2.3";
 
 // System Libraries
 #include <stdio.h>
@@ -276,20 +276,14 @@ void draw_water(){
 
     static char skip_frame = 0;
 
-    if(skip_frame == 1){
-        skip_frame = 0;
-        return;
+    if(skip_frame == 0){
+        skip_frame = 2;
     } else {
-        skip_frame = 1;
+        skip_frame -= 1;
+        return;
     }
 
-    /*
-        0-1 -> 0
-        2,5 -> 1
-        3-4 -> 2
-        
-    */
-    static int8_t frame_cnt = 0;
+    static int8_t frame_cnt = 3;
 
     static int size = 0;
     int x_offset = 1;
@@ -300,29 +294,61 @@ void draw_water(){
 
     if(black_and_white == 0) attron(COLOR_PAIR(CYAN) | A_BOLD);
 
-    char water_pattern[10] = {};
+    char water_pattern[12] = {};
 
     switch(frame_cnt){
         case 0:
+        case 11:
+            strcpy(water_pattern, ".----.____");
+            break;
         case 1:
-            strcpy(water_pattern, "--..__..");
+        case 10:
+            strcpy(water_pattern, "_.----.___");
             break;
         case 2:
-        case 5:
-            strcpy(water_pattern, "-..__..-");
+        case 9:
+            strcpy(water_pattern, "__.----.__");
             break;
         case 3:
-        case 4:
-            strcpy(water_pattern, "..__..--");
+        case 8:
+            strcpy(water_pattern, "___.----._");
             break;
+        case 4:
+        case 7:
+            strcpy(water_pattern, "____.----.");
+            break;
+        case 5:
+        case 6:
+        case 16:
+        case 17:
+            strcpy(water_pattern, ".____.----");
+            break;
+
+        case 12:
+        case 21:
+            strcpy(water_pattern, "----.____.");
+            break;
+        case 13:
+        case 20:
+            strcpy(water_pattern, "---.____.-");
+            break;
+        case 14:
+        case 19:
+            strcpy(water_pattern, "--.____.--");
+            break;
+        case 15:
+        case 18:
+            strcpy(water_pattern, "-.____.---");
+            break;
+
     }
     
     frame_cnt++;
-    frame_cnt = frame_cnt % 6;
+    frame_cnt = frame_cnt % 22;
 
     while(x_offset < size){
-        mvaddnstr(1, x_offset, water_pattern, 8);
-        x_offset += 8;
+        mvaddnstr(1, x_offset, water_pattern, 10);
+        x_offset += 10;
     }
 
     if(black_and_white == 0) attroff(COLOR_PAIR(CYAN) | A_BOLD);
@@ -558,14 +584,14 @@ int update(){
                 wrefresh(input_win);
                 napms(750);
                 break;
-            case SEED:
-
+            case SEED: {
                 char parsed_seed[12] = {0};
                 itocstr((signed int)seed, parsed_seed, 12);
                 waddnstr(input_win, parsed_seed, 12);
                 waddnstr(input_win, "\tPress space to resume game...", 31);
                 while(!(wgetch(input_win) == SPACE_KEY));
                 break;
+            }
             case QUIT:
 
                 return 127;
@@ -611,8 +637,8 @@ int update(){
                 wrefresh(input_win);
                 napms(750);
                 break;
-
-            default:
+            case _BLANK:
+                break;
         }
 
         delwin(input_win);
